@@ -1,5 +1,8 @@
+using Fincore.Application.AutoMapper;
+using Fincore.Application.Interfaces;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+using Fincore.Infrastructure.Services;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
@@ -35,6 +38,10 @@ builder.Services.AddRateLimiter(options =>
 });
 
 builder.Services.AddMemoryCache();
+
+builder.Services.AddAutoMapper(typeof(ReportProfile));
+
+builder.Services.AddScoped<IReportService, ReportService>();
 
 var app = builder.Build();
 
