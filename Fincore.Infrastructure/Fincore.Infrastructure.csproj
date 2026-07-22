@@ -7,10 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
+    <Folder Include="Services\Capex\" />
+    <Folder Include="Services\MasterTable\" />
+    <Folder Include="Services\Budget\" />
+    <Folder Include="Services\Logs\" />
+    <Folder Include="Services\Payment\" />
+    <Folder Include="Services\Opex\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Bogus" Version="35.6.5" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.28" />
   </ItemGroup>
