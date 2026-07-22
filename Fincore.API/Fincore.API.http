@@ -1,0 +1,6 @@
+@Fincore.API_HostAddress = http://localhost:5078
+
+GET {{Fincore.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
