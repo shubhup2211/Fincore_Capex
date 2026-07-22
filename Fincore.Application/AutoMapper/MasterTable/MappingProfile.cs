@@ -1,0 +1,31 @@
+﻿using AutoMapper;
+using Fincore.Application.DTO.MasterTable;
+using Fincore.Domain.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Fincore.Application.AutoMapper.MasterTable
+{
+    public class MappingProfile : Profile
+    {
+        public MappingProfile()
+        {
+            // CreateCompanyDto -> Company
+            CreateMap<CreateCompanyDto, Company>();
+
+            // UpdateCompanyDto -> Company
+            CreateMap<UpdateCompanyDto, Company>();
+
+            // Company -> CompanyDto
+            CreateMap<Company, CompanyDto>()
+                .ForMember(dest => dest.CountryName,
+                    opt => opt.MapFrom(src => src.Country != null ? src.Country.CountryName : ""))
+
+                .ForMember(dest => dest.MasterTypeName,
+                    opt => opt.MapFrom(src => src.MasterType != null ? src.MasterType.MasterTypeName : ""));
+        }
+    }
+}

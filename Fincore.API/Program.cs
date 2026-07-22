@@ -1,5 +1,8 @@
+using Fincore.Application.AutoMapper.MasterTable;
+using Fincore.Application.Interfaces.IMasterTable;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+using Fincore.Infrastructure.Services.MasterTable;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
@@ -36,6 +39,17 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.AddMemoryCache();
 
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+
+
+
+
+
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -45,7 +59,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-await DatabaseSeeder.SeedAsync(app.Services);
+//await DatabaseSeeder.SeedAsync(app.Services);
 
 app.UseHttpsRedirection();
 
