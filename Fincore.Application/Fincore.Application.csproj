@@ -14,13 +14,11 @@
     <Folder Include="AutoMapper\Payment\" />
     <Folder Include="AutoMapper\Opex\" />
     <Folder Include="DTO\Capex\" />
-    <Folder Include="DTO\MasterTable\" />
     <Folder Include="DTO\Budget\" />
     <Folder Include="DTO\Logs\" />
     <Folder Include="DTO\Payment\" />
     <Folder Include="DTO\Opex\" />
     <Folder Include="Interfaces\ICapex\" />
-    <Folder Include="Interfaces\IMasterTable\" />
     <Folder Include="Interfaces\IBudget\" />
     <Folder Include="Interfaces\IPayment\" />
     <Folder Include="Interfaces\IOpex\" />
@@ -28,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
     <PackageReference Include="NPOI" Version="2.8.0" />
   </ItemGroup>
 

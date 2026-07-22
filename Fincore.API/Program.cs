@@ -1,8 +1,11 @@
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+using Fincore.Infrastructure.Services.MasterTable;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
+using Fincore.Application.Interfaces.IMasterTable;
+using Fincore.Application.AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +21,12 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("dbconn"),
 b => b.MigrationsAssembly("Fincore.Infrastructure")));
 
 
+
+builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+
+
 //Rate limitng
 builder.Services.AddRateLimiter(options =>
 {
@@ -26,7 +35,7 @@ builder.Services.AddRateLimiter(options =>
         policy.PermitLimit = 10;
         policy.Window = TimeSpan.FromMinutes(1);
 
-        policy.QueueLimit = 0;
+        policy.QueueLimit = 0;s
 
         policy.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
     });
