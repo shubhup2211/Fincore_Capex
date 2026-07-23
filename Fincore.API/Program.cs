@@ -23,6 +23,8 @@ b => b.MigrationsAssembly("Fincore.Infrastructure")));
 
 
 builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<IDocumentTypeService,DocumentTypeService>();
+builder.Services.AddScoped<IMasterType, MasterTypeService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 

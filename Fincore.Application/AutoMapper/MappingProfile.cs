@@ -17,6 +17,19 @@ namespace Fincore.Application.AutoMapper
             CreateMap<Document, DocumentDto>();
             CreateMap<CreateDocumentDto, Document>();
             CreateMap<UpdateDocumentDto, Document>();
+
+
+            CreateMap<DocumentType, DocumentTypeDto>();
+            CreateMap<CreateDocumentTypeDto, DocumentType>();
+            CreateMap<UpdateDocumentTypeDto, DocumentType>();
+
+
+            CreateMap<MasterType, MasterTypeDto>();
+            CreateMap<CreateMasterTypeDto, MasterType>();
+            CreateMap<UpdateMasterTypeDto, MasterType>();
+
+
+
         }
 
 
