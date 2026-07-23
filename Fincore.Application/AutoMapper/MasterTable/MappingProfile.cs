@@ -26,6 +26,22 @@ namespace Fincore.Application.AutoMapper.MasterTable
 
                 .ForMember(dest => dest.MasterTypeName,
                     opt => opt.MapFrom(src => src.MasterType != null ? src.MasterType.MasterTypeName : ""));
+
+            CreateMap<Department, DepartmentDTO>()
+    .ForMember(dest => dest.CompanyName,
+        opt => opt.MapFrom(src => src.Company.CompanyName))
+
+    .ForMember(dest => dest.MasterTypeName,
+        opt => opt.MapFrom(src => src.MasterType != null
+            ? src.MasterType.MasterTypeName
+            : null))
+
+    .ForMember(dest => dest.ManagerName,
+        opt => opt.MapFrom(src => src.Manager != null
+            ? src.Manager.User.FullName
+            : null));
+
+            CreateMap<DepartmentDTO, Department>();
         }
     }
 }

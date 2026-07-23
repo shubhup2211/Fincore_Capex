@@ -845,18 +845,16 @@ namespace Fincore.Infrastructure.Migrations
 
                     b.HasKey("DepartmentId");
 
-                    b.HasIndex("CompanyId");
-
                     b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DepartmentCode")
-                        .IsUnique();
 
                     b.HasIndex("ManagerId");
 
                     b.HasIndex("MasterTypeId");
 
                     b.HasIndex("ModifiedBy");
+
+                    b.HasIndex("CompanyId", "DepartmentCode")
+                        .IsUnique();
 
                     b.ToTable("Departments");
                 });

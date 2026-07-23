@@ -183,8 +183,17 @@ namespace Fincore.Infrastructure.Data
             modelBuilder.Entity<Department>(entity =>
             {
                 entity.HasKey(e => e.DepartmentId);
-                entity.Property(e => e.DepartmentCode).IsRequired().HasMaxLength(30);
-                entity.HasIndex(e => e.DepartmentCode).IsUnique();
+
+                entity.Property(e => e.DepartmentCode)
+                    .IsRequired()
+                    .HasMaxLength(30);
+
+                entity.HasIndex(e => new
+                {
+                    e.CompanyId,
+                    e.DepartmentCode
+                })
+                .IsUnique();
 
                 entity.HasOne(e => e.Company)
                     .WithMany(c => c.Departments)
