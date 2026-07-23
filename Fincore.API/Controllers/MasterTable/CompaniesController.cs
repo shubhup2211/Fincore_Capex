@@ -1,6 +1,5 @@
 ﻿using Fincore.Application.DTO;
 using Fincore.Application.DTO.MasterTable;
-using Fincore.Application.Interfaces;
 using Fincore.Application.Interfaces.IMasterTable;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +17,21 @@ namespace Fincore.API.Controllers.MasterTable
             this.companyService = companyService;
         }
 
+        // Return response
+        private IActionResult GetResponse<T>(ApiResponse<T> result)
+        {
+            if (result.success)
+            {
+                return Ok(result);
+            }
 
+            return result.Error?.code switch
+            {
+                "404" => NotFound(result),
+                "409" => Conflict(result),
+                _ => BadRequest(result)
+            };
+        }
 
         // Create company
         [HttpPost]
@@ -26,18 +39,7 @@ namespace Fincore.API.Controllers.MasterTable
         {
             var result = await companyService.CreateCompanyAsync(dto);
 
-            if (!result.success)
-            {
-                if (result.Error?.code == "404")
-                    return NotFound(result);
-
-                if (result.Error?.code == "409")
-                    return Conflict(result);
-
-                return BadRequest(result);
-            }
-
-            return Ok(result);
+            return GetResponse(result);
         }
 
         // Get all companies
@@ -46,18 +48,7 @@ namespace Fincore.API.Controllers.MasterTable
         {
             var result = await companyService.GetAllCompaniesAsync(page, limit);
 
-            if (!result.success)
-            {
-                if (result.Error?.code == "404")
-                    return NotFound(result);
-
-                if (result.Error?.code == "409")
-                    return Conflict(result);
-
-                return BadRequest(result);
-            }
-
-            return Ok(result);
+            return GetResponse(result);
         }
 
         // Get company by id
@@ -66,18 +57,7 @@ namespace Fincore.API.Controllers.MasterTable
         {
             var result = await companyService.GetCompanyByIdAsync(companyId);
 
-            if (!result.success)
-            {
-                if (result.Error?.code == "404")
-                    return NotFound(result);
-
-                if (result.Error?.code == "409")
-                    return Conflict(result);
-
-                return BadRequest(result);
-            }
-
-            return Ok(result);
+            return GetResponse(result);
         }
 
         // Update company
@@ -86,18 +66,7 @@ namespace Fincore.API.Controllers.MasterTable
         {
             var result = await companyService.UpdateCompanyAsync(dto);
 
-            if (!result.success)
-            {
-                if (result.Error?.code == "404")
-                    return NotFound(result);
-
-                if (result.Error?.code == "409")
-                    return Conflict(result);
-
-                return BadRequest(result);
-            }
-
-            return Ok(result);
+            return GetResponse(result);
         }
 
         // Delete company
@@ -106,18 +75,7 @@ namespace Fincore.API.Controllers.MasterTable
         {
             var result = await companyService.DeleteCompanyAsync(companyId);
 
-            if (!result.success)
-            {
-                if (result.Error?.code == "404")
-                    return NotFound(result);
-
-                if (result.Error?.code == "409")
-                    return Conflict(result);
-
-                return BadRequest(result);
-            }
-
-            return Ok(result);
+            return GetResponse(result);
         }
     }
 }

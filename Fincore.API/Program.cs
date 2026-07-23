@@ -67,6 +67,7 @@ app.UseAuthorization();
 
 app.UseRateLimiter();
 
-app.MapControllers();
+app.MapControllers()
+    .RequireRateLimiting("FixedPolicy");
 
 app.Run();
