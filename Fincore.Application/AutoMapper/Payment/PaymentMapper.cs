@@ -4,14 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Fincore.Domain.Models;
+using Fincore.Application.DTO.Payment;
 
-namespace Fincore.Application.AutoMapper.Payment
+
+public class PaymentMapper : Profile
 {
-    public class PaymentMapper : Profile
+    public PaymentMapper()
     {
-        public PaymentMapper()
-        {
-            
-        }
+       
+        CreateMap<PaymentPostDTO, Payment>().ReverseMap();
+        CreateMap<PaymentGetDTO, Payment>().ReverseMap();
+        CreateMap<PaymentUpdateDTO, Payment>().ReverseMap();
     }
 }
+

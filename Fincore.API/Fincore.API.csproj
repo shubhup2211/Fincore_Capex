@@ -24,7 +24,6 @@
     <Folder Include="Controllers\MasterTable\" />
     <Folder Include="Controllers\Budget\" />
     <Folder Include="Controllers\Logs\" />
-    <Folder Include="Controllers\Payment\" />
     <Folder Include="Controllers\Opex\" />
   </ItemGroup>
 

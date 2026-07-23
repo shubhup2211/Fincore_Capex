@@ -17,8 +17,7 @@ namespace Fincore.Application.DTO.Payment
 
         public int? ARInvoiceId { get; set; }
 
-        [Required]
-        public decimal Amount { get; set; }
+        
 
         [Required]
         public DateTime PaymentDate { get; set; }

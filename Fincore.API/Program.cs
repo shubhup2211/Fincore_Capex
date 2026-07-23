@@ -1,7 +1,11 @@
+using Fincore.Application.Interfaces.IPayment;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+using Fincore.Infrastructure.Services.PaymentModule;
+
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +20,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("dbconn"),
 b => b.MigrationsAssembly("Fincore.Infrastructure")));
-
+builder.Services.AddAutoMapper(typeof(PaymentMapper));
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 //Rate limitng
 builder.Services.AddRateLimiter(options =>
@@ -34,6 +39,11 @@ builder.Services.AddRateLimiter(options =>
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 });
 
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 builder.Services.AddMemoryCache();
 
 var app = builder.Build();
