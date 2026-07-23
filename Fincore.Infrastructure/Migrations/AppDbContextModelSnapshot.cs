@@ -726,10 +726,8 @@ namespace Fincore.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CountryId"));
 
-                    b.Property<string>("CountryCode")
-                        .IsRequired()
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
+                    b.Property<int>("CountryCode")
+                        .HasColumnType("int");
 
                     b.Property<string>("CountryName")
                         .IsRequired()
