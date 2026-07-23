@@ -1,7 +1,11 @@
+using Fincore.Application.AutoMapper.MasterTable;
+using Fincore.Application.Interfaces.IMasterTable;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+using Fincore.Infrastructure.Services.MasterTable;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +16,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("dbconn"),
@@ -36,6 +41,14 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.AddMemoryCache();
 
+builder.Services.AddScoped<IAccountMasterService, AccountMasterService>();
+builder.Services.AddAutoMapper(typeof(AccountsMasterMapper));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -45,7 +58,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-await DatabaseSeeder.SeedAsync(app.Services);
+//await DatabaseSeeder.SeedAsync(app.Services);
 
 app.UseHttpsRedirection();
 
