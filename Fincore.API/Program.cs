@@ -1,6 +1,7 @@
 using Fincore.Application.Interfaces.IPayment;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+
 using Fincore.Infrastructure.Services.PaymentModule;
 
 using Microsoft.AspNetCore.RateLimiting;
@@ -22,6 +23,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("dbconn"),
 b => b.MigrationsAssembly("Fincore.Infrastructure")));
 builder.Services.AddAutoMapper(typeof(PaymentMapper));
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IJournalEntryService, JournalEntryService>();
 
 //Rate limitng
 builder.Services.AddRateLimiter(options =>
