@@ -1,11 +1,13 @@
+using Fincore.Application.AutoMapper;
+using Fincore.Application.Interfaces.Dashboard;
+using Fincore.Application.Interfaces.IMasterTable;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+using Fincore.Infrastructure.Services.Dashboard;
 using Fincore.Infrastructure.Services.MasterTable;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
-using Fincore.Application.Interfaces.IMasterTable;
-using Fincore.Application.AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,7 @@ b => b.MigrationsAssembly("Fincore.Infrastructure")));
 
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IDocumentTypeService,DocumentTypeService>();
+builder.Services.AddScoped<IExecutiveService, ExecutiveService>();
 builder.Services.AddScoped<IMasterType, MasterTypeService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
