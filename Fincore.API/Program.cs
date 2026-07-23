@@ -1,5 +1,8 @@
+using Fincore.Application.AutoMapper.Capex;
+using Fincore.Application.Interfaces.ICapex;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+using Fincore.Infrastructure.Services.Capex;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
@@ -26,7 +29,7 @@ builder.Services.AddRateLimiter(options =>
         policy.PermitLimit = 10;
         policy.Window = TimeSpan.FromMinutes(1);
 
-        policy.QueueLimit = 0;
+        policy.QueueLimit = 0;  
 
         policy.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
     });
@@ -35,6 +38,8 @@ builder.Services.AddRateLimiter(options =>
 });
 
 builder.Services.AddMemoryCache();
+builder.Services.AddAutoMapper(typeof(MapperConfigPurchaseOrder));
+builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
 
 var app = builder.Build();
 
@@ -45,13 +50,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-await DatabaseSeeder.SeedAsync(app.Services);
+//await DatabaseSeeder.SeedAsync(app.Services);
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
-
 app.UseRateLimiter();
+
+app.UseAuthorization();
 
 app.MapControllers();
 
