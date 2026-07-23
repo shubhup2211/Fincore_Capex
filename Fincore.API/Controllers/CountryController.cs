@@ -1,4 +1,5 @@
-﻿using Fincore.Application.Interfaces;
+﻿using Fincore.Application.DTOs;
+using Fincore.Application.Interfaces;
 using Fincore.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,10 +38,14 @@ namespace Fincore.API.Controllers
 
         // POST: api/Country
         [HttpPost]
-        public async Task<IActionResult> Create(Country country)
+        public async Task<IActionResult> Create(CountryRequestDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var country = new Country
+            {
+                CountryCode = dto.CountryCode,
+                CountryName = dto.CountryName,
+                CurrencyId = dto.CurrencyId
+            };
 
             var result = await _countryService.CreateAsync(country);
 
@@ -49,29 +54,42 @@ namespace Fincore.API.Controllers
 
         // PUT: api/Country/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Country country)
+        public async Task<IActionResult> Update(int id, CountryRequestDto dto)
         {
-            if (id != country.CountryId)
-                return BadRequest("Country Id mismatch.");
+            var country = new Country
+            {
+                CountryCode = dto.CountryCode,
+                CountryName = dto.CountryName,
+                CurrencyId = dto.CurrencyId
+            };
 
             var result = await _countryService.UpdateAsync(id, country);
 
             if (result == null)
-                return NotFound("Country not found.");
+                return NotFound();
 
             return Ok(result);
         }
 
-        // DELETE: api/Country/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _countryService.DeleteAsync(id);
+            try
+            {
+                var result = await _countryService.DeleteAsync(id);
 
-            if (!deleted)
-                return NotFound("Country not found.");
+                if (!result)
+                    return NotFound();
 
-            return Ok("Country deleted successfully.");
+                return Ok("Country deleted successfully.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
+
+
     }
 }
