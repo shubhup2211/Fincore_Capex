@@ -35,7 +35,7 @@ builder.Services.AddRateLimiter(options =>
         policy.PermitLimit = 10;
         policy.Window = TimeSpan.FromMinutes(1);
 
-        policy.QueueLimit = 0;s
+        policy.QueueLimit = 0;
 
         policy.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
     });

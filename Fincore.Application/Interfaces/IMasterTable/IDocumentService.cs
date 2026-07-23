@@ -1,15 +1,16 @@
-﻿using Fincore.Application.DTO.MasterTable;
+﻿using Fincore.Application.DTO;
+using Fincore.Application.DTO.MasterTable;
 
 namespace Fincore.Application.Interfaces.IMasterTable
 {
     public interface IDocumentService
     {
-        Task<List<DocumentDto>> GetAll(int page,int pageSize);
-        Task<DocumentDto> DocumentGetById(int id);
-        Task<DocumentDto> AddDocument(CreateDocumentDto dto);
-        Task<DocumentDto> UpdateDocument(int id,UpdateDocumentDto dto);
+        Task<ApiResponse<List<DocumentDto>>> GetAll(int page, int pageSize);
+        Task<ApiResponse<DocumentDto>> DocumentGetById(int id);
+        Task<ApiResponse<DocumentDto>> AddDocument(CreateDocumentDto dto);
+        Task<ApiResponse<DocumentDto>> UpdateDocument(int id,UpdateDocumentDto dto);
 
-        Task<bool> DeleteDocument(int id);
+        Task<ApiResponse<bool>> DeleteDocument(int id);
     }
 
 }

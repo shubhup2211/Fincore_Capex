@@ -23,7 +23,7 @@ namespace Fincore.API.Controllers.MasterTable
             var data = await repo.GetAll(page,pageSize);
 
 
-            return Ok(new{status = true,message = "Documents Fetch Successfully",Data = data});
+            return Ok(data);
         }
 
         [HttpGet]
@@ -36,7 +36,7 @@ namespace Fincore.API.Controllers.MasterTable
                 return NotFound();
             }
 
-            return Ok(new{status = true,message = "Document Fetch Successfully",Data = data});
+            return Ok(data);
         }
 
 
@@ -45,12 +45,8 @@ namespace Fincore.API.Controllers.MasterTable
         {
             var data = await repo.AddDocument(dto);
 
-            return Ok(new
-            {
-                status = true,
-                message = "Document Added Successfully",
-                Data = data
-            });
+            return Ok(data);
+            
         }
 
         [HttpPut]
@@ -58,25 +54,27 @@ namespace Fincore.API.Controllers.MasterTable
         public async Task<IActionResult> UpadateDocument(int id, UpdateDocumentDto dto) 
         {
             var data = await repo.UpdateDocument(id,dto);
-            return Ok(new { status = true, message = "Document Update Successfully", Data = data });
+            return Ok(data);
 
         }
 
+
+        
 
         [HttpDelete]
-
-        public async Task<IActionResult> DeleteDocument(int id) 
+        public async Task<IActionResult> DeleteDocument(int id)
         {
             var data = await repo.DeleteDocument(id);
-            if (!data) 
+
+            if (!data.success)
             {
-            return NotFound(new { status = false, message = "Document Not Found" });
-            
+                return NotFound(data);
             }
-            return Ok(new { status = true, message = "Document Delete Successfully" });
+
+            return Ok(data);
         }
-    
-    
+
+
     }
 
 
