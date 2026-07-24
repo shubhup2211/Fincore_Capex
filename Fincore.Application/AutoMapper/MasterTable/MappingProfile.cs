@@ -281,6 +281,63 @@ namespace Fincore.Application.AutoMapper.MasterTable
 
                 .ForMember(dest => dest.GRNsCreated,
                     opt => opt.Ignore());
+
+
+
+            // Customer Mapping
+            CreateMap<Customer, CustomerDto>()
+
+                .ForMember(dest => dest.UserName,
+                    opt => opt.MapFrom(src =>
+                        src.User != null
+                            ? src.User.FullName
+                            : null))
+
+                .ForMember(dest => dest.CompanyName,
+                    opt => opt.MapFrom(src =>
+                        src.Company != null
+                            ? src.Company.CompanyName
+                            : null));
+
+
+            CreateMap<CreateCustomerDto, Customer>()
+                .ForMember(dest => dest.CustomerId,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.User,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Company,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.RevenueEntries,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.ARInvoices,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Payments,
+                    opt => opt.Ignore());
+
+
+            CreateMap<UpdateCustomerDto, Customer>()
+                .ForMember(dest => dest.CustomerId,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.User,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Company,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.RevenueEntries,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.ARInvoices,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Payments,
+                    opt => opt.Ignore());
         }
     }
 }
