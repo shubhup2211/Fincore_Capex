@@ -135,6 +135,59 @@ namespace Fincore.Application.AutoMapper.MasterTable
                     opt => opt.Ignore())
                 .ForMember(dest => dest.ModifiedByUser,
                     opt => opt.Ignore());
+
+
+            // Role Mapping
+            CreateMap<Role, RoleDto>();
+
+            CreateMap<CreateRoleDto, Role>()
+                .ForMember(dest => dest.RoleId,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.UserId,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.User,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedAt,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedBy,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedByUser,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedByUser,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.Users,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.Permissions,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovalFlows,
+                    opt => opt.Ignore());
+
+
+            CreateMap<UpdateRoleDto, Role>()
+                .ForMember(dest => dest.RoleId,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.UserId,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.User,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedAt,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedByUser,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedByUser,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.Users,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.Permissions,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ApprovalFlows,
+                    opt => opt.Ignore());
         }
     }
 }

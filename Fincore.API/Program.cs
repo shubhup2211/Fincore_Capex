@@ -53,7 +53,7 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<IPermissionService, PermissionService>();
-
+builder.Services.AddScoped<IRoleService, RoleService>();
 
 
 var app = builder.Build();
