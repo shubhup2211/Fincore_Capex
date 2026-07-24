@@ -1,7 +1,11 @@
+using Fincore.Application.AutoMapper.Capex;
+using Fincore.Application.Interfaces.ICapex;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+using Fincore.Infrastructure.Services.Capex;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +20,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("dbconn"),
 b => b.MigrationsAssembly("Fincore.Infrastructure")));
-
 
 //Rate limitng
 builder.Services.AddRateLimiter(options =>
@@ -35,6 +38,19 @@ builder.Services.AddRateLimiter(options =>
 });
 
 builder.Services.AddMemoryCache();
+
+builder.Services.AddScoped<ICapexReq, CapexReq>();
+builder.Services.AddScoped<IPRService, PRService>();
+builder.Services.AddScoped<IPRItemService, PRItemService>();
+builder.Services.AddScoped<IRFQService, RFQService>();
+builder.Services.AddScoped<IRFQVendorService, RFQVendorService>();
+builder.Services.AddScoped<IQuotationService, QuotationService>();
+builder.Services.AddScoped<IQuotationItemService, QuotationItemService>();
+builder.Services.AddScoped<IVendorSelectionService, VendorSelectionService>();
+builder.Services.AddScoped<IApprovalFlowService, ApprovalFlowService>();
+
+
+builder.Services.AddAutoMapper(typeof(AMCapexRequest));
 
 var app = builder.Build();
 

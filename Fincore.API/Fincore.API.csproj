@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Capex\" />
     <Folder Include="Controllers\MasterTable\" />
     <Folder Include="Controllers\Budget\" />
     <Folder Include="Controllers\Logs\" />

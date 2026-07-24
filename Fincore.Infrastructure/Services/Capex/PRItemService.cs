@@ -1,0 +1,150 @@
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Fincore.Application.DTO;
+using Fincore.Application.DTO.Capex;
+using Fincore.Application.Interfaces.ICapex;
+using Fincore.Domain.Models;
+using Fincore.Infrastructure.CommonHelper;
+using Fincore.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Fincore.Infrastructure.Services.Capex
+{
+    public class PRItemService : IPRItemService
+    {
+        private readonly AppDbContext db;
+        IMapper map;
+        IMemoryCache memoryCache;
+        public PRItemService(AppDbContext db, IMapper map, IMemoryCache memoryCache)
+        {
+            this.db = db;
+            this.map = map;
+            this.memoryCache = memoryCache;
+        }
+
+        public async Task<ApiResponse<string>> CreatePRItem(PRItemDTOPost pr)
+        {
+            var add = map.Map<PurchaseRequisitionItem>(pr);
+            await db.PurchaseRequisitionItems.AddAsync(add);
+            var result = await db.SaveChangesAsync();
+            memoryCache.Remove(pr);
+
+            if (result > 0)
+            {
+                return ApiResponseHelper.SuccessRes(
+                      result.ToString(), "Purchase Requisition Item added successfully");
+            }
+            else
+            {
+                return ApiResponseHelper.Failure<string>(
+                     "Purchase Requisition Item add failed", "ERROR_OCCURED", "Failed to add Purchase Requisition Item");
+            }
+        }
+
+        public async Task<ApiResponse<string>> DeletePRItem(int id)
+        {
+            var pr = await db.PurchaseRequisitionItems.FindAsync(id);
+
+            if (pr == null)
+            {
+                return ApiResponseHelper.Failure<string>(
+                                   "Cannot Delete Purchase Requistion Item", "NOT_FOUND", $"Purchase Requistion Item with id {id} Not found");
+
+            }
+
+            db.PurchaseRequisitionItems.Remove(pr);
+            await db.SaveChangesAsync();
+
+            return ApiResponseHelper.SuccessRes($"Purchase Requistion Item Deleted Successfully with id {id}");
+
+        }
+
+        public async Task<ApiResponse<List<PRItemDTOGet>>> GetPRItem(int page, int pagesize)
+        {
+            string cacheKey = $"PR_{page}_{pagesize}";
+
+            if (memoryCache.TryGetValue(cacheKey, out List<PRItemDTOGet> PRlist))
+            {
+                return ApiResponseHelper.SuccessRes(
+                    PRlist, "Purchase Requistion Items fetched successfully", PRlist.Count, new { page = page, pagesize = pagesize });
+            }
+
+            PRlist = await db.PurchaseRequisitionItems
+                .Skip((page - 1) * pagesize).Take(pagesize)
+                .ProjectTo<PRItemDTOGet>(map.ConfigurationProvider)
+                .ToListAsync();
+
+            if (PRlist == null & !PRlist.Any())
+            {
+                return ApiResponseHelper.Failure<List<PRItemDTOGet>>(
+                    "Purchase Requistion Items not found", "EMPTY_DATA", "No Data to show");
+            }
+
+            memoryCache.Set(cacheKey, PRlist);
+
+            return ApiResponseHelper.SuccessRes(
+                    PRlist, "Purchase Requistion Items fetched successfully", PRlist.Count, new { page = page, pagesize = pagesize });
+
+        }
+
+        public async Task<ApiResponse<PRItemDTOGet>> GetPRItemById(int id)
+        {
+            string cacheKey = $"{id}";
+
+            if (memoryCache.TryGetValue(cacheKey, out PRItemDTOGet pr))
+            {
+                return ApiResponseHelper.SuccessRes(
+                    pr, $"Purchase Requistion Item with Id {id} found", 1);
+            }
+
+            pr = await db.PurchaseRequisitionItems
+                .Where(x => x.PRItemId == id)
+                .ProjectTo<PRItemDTOGet>(map.ConfigurationProvider)
+                .FirstOrDefaultAsync();
+
+            if (pr == null)
+            {
+                return ApiResponseHelper.Failure<PRItemDTOGet>(
+                    "Purchase Requistion Item Record not found", "NOT_FOUND", $"Purchase Requistion Item with Id {id} not found");
+            }
+
+            return ApiResponseHelper.SuccessRes(
+                    pr, $"Purchase Requistion Item with Id {id} found", 1);
+        }
+
+        public async Task<ApiResponse<string>> UpdatePRItem(int id, PRItemDTOPost pr)
+        {
+            var update = await db.PurchaseRequisitionItems.FirstOrDefaultAsync(x => x.PRItemId == id);
+
+            if (update == null)
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "Purchase Requistion Item Not Found", "NOT_FOUND", $"Purchase Requistion Item with id {id} Not found");
+            }
+
+            if (update.ItemStatus != "Draft")
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "Cannot Update Item",
+                    "INVALID_STATUS",
+                    "Items can only be updated when the Purchase Requisition is in Draft status.");
+            }
+
+            map.Map(pr, update);
+            await db.SaveChangesAsync();
+
+            string cache = $"{id}";
+            memoryCache.Remove(cache);
+
+            return ApiResponseHelper.SuccessRes($"Purchase Requistion Item Updated Successfully with id {id}");
+
+        }
+
+    }
+}
