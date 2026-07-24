@@ -1,8 +1,10 @@
 using Fincore.Application.AutoMapper.MasterTable;
 using Fincore.Application.Interfaces.IMasterTable;
+using Fincore.Domain.Models;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
 using Fincore.Infrastructure.Services.MasterTable;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
@@ -48,7 +50,8 @@ builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
-
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 var app = builder.Build();
 
