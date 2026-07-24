@@ -18,8 +18,7 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // GET ALL
-        // GET: api/v1/departments?pageNumber=1&pageSize=10
+       
         [HttpGet]
         public async Task<IActionResult> GetAllDepartments(
             int pageNumber = 1,
@@ -35,8 +34,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // GET BY ID
-        // GET: api/v1/departments/1
         [HttpGet("{id}")]
         public async Task<IActionResult> GetDepartmentById(int id)
         {
@@ -50,8 +47,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // CREATE
-        // POST: api/v1/departments
         [HttpPost]
         public async Task<IActionResult> CreateDepartment(
             [FromBody] DepartmentDTO departmentDTO)
@@ -66,8 +61,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // UPDATE
-        // PUT: api/v1/departments/1
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateDepartment(
             int id,
@@ -83,8 +76,7 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // DELETE
-        // DELETE: api/v1/departments/1
+       
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {

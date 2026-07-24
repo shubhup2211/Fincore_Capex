@@ -21,7 +21,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
         }
 
 
-        // GET ALL DEPARTMENTS
         public async Task<ApiResponse<IEnumerable<DepartmentDTO>>> GetAllDepartmentsAsync(
             int pageNumber,
             int pageSize)
@@ -72,8 +71,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // GET DEPARTMENT BY ID
         public async Task<ApiResponse<DepartmentDTO>> GetDepartmentByIdAsync(int id)
         {
             try
@@ -110,13 +107,12 @@ namespace Fincore.Infrastructure.Services.MasterTable
         }
 
 
-        // CREATE DEPARTMENT
         public async Task<ApiResponse<DepartmentDTO>> CreateDepartmentAsync(
             DepartmentDTO departmentDTO)
         {
             try
             {
-                // Check company
+                
                 var companyExists = await db.Companies
                     .AnyAsync(x => x.CompanyId == departmentDTO.CompanyId);
 
@@ -129,7 +125,7 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check duplicate department code inside same company
+               
                 var duplicate = await db.Departments
                     .AnyAsync(x =>
                         x.CompanyId == departmentDTO.CompanyId &&
@@ -144,7 +140,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check MasterType if supplied
                 if (departmentDTO.MasterTypeId.HasValue)
                 {
                     var masterTypeExists = await db.MasterTypes
@@ -161,7 +156,7 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check Manager if supplied
+              
                 if (departmentDTO.ManagerId.HasValue)
                 {
                     var managerExists = await db.Employees
@@ -189,7 +184,7 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 await db.SaveChangesAsync();
 
 
-                // Get complete created record
+                
                 var createdDepartment = await db.Departments
                     .Include(x => x.Company)
                     .Include(x => x.MasterType)
@@ -215,7 +210,7 @@ namespace Fincore.Infrastructure.Services.MasterTable
         }
 
 
-        // UPDATE DEPARTMENT
+        
         public async Task<ApiResponse<DepartmentDTO>> UpdateDepartmentAsync(
             int id,
             DepartmentDTO departmentDTO)
@@ -234,7 +229,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check company
                 var companyExists = await db.Companies
                     .AnyAsync(x => x.CompanyId == departmentDTO.CompanyId);
 
@@ -247,7 +241,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check duplicate department code
                 var duplicate = await db.Departments
                     .AnyAsync(x =>
                         x.CompanyId == departmentDTO.CompanyId &&
@@ -263,7 +256,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check MasterType if supplied
                 if (departmentDTO.MasterTypeId.HasValue)
                 {
                     var masterTypeExists = await db.MasterTypes
@@ -280,7 +272,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check Manager if supplied
                 if (departmentDTO.ManagerId.HasValue)
                 {
                     var managerExists = await db.Employees
@@ -310,7 +301,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 await db.SaveChangesAsync();
 
 
-                // Get updated complete record
                 var updatedDepartment = await db.Departments
                     .Include(x => x.Company)
                     .Include(x => x.MasterType)
@@ -334,8 +324,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // DELETE DEPARTMENT
         public async Task<ApiResponse<bool>> DeleteDepartmentAsync(int id)
         {
             try

@@ -13,13 +13,12 @@ namespace Fincore.Application.AutoMapper.MasterTable
     {
         public MappingProfile()
         {
-            // CreateCompanyDto -> Company
+    
             CreateMap<CreateCompanyDto, Company>();
 
-            // UpdateCompanyDto -> Company
+           
             CreateMap<UpdateCompanyDto, Company>();
 
-            // Company -> CompanyDto
             CreateMap<Company, CompanyDto>()
                 .ForMember(dest => dest.CountryName,
                     opt => opt.MapFrom(src => src.Country != null ? src.Country.CountryName : ""))
