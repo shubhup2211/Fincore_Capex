@@ -4,51 +4,60 @@ using Fincore.Application.Interfaces.Dashboard;
 using Fincore.Infrastructure.CommonHelper;
 using Fincore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+
 
 namespace Fincore.Infrastructure.Services.Dashboard
 {
     public class ExecutiveService : IExecutiveService
     {
-         AppDbContext _db;
-
-        public ExecutiveService(AppDbContext db)
+         AppDbContext db;
+        IMemoryCache cache;
+        public ExecutiveService(AppDbContext db,IMemoryCache cache)
         {
-            _db = db;
+            this.db = db;
+            this.cache = cache;
         }
 
         public async Task<ApiResponse<ExecutiveDashboardDto>> GetExecutiveDashboard()
         {
-            var dashboard = new ExecutiveDashboardDto
+            const string cacheKey = "ExecutiveDashboard";
+
+            if (!cache.TryGetValue(cacheKey, out ExecutiveDashboardDto dashboard))
             {
-                TotalRevenue = await _db.RevenueEntries.SumAsync(x => x.Amount),
+                dashboard = new ExecutiveDashboardDto
+                {
+                    TotalRevenue = await db.RevenueEntries.SumAsync(x => x.Amount),
 
-                TotalInvoices = await _db.RevenueEntries.CountAsync(),
+                    TotalInvoices = await db.RevenueEntries.CountAsync(),
 
-                ReceivedRevenue = await _db.RevenueEntries
-                    .Where(x => x.Status == "Received")
-                    .SumAsync(x => (decimal?)x.Amount) ?? 0,
+                    ReceivedRevenue = await db.RevenueEntries
+                        .Where(x => x.Status == "Received")
+                        .SumAsync(x => (decimal?)x.Amount) ?? 0,
 
-                PendingRevenue = await _db.RevenueEntries
-                    .Where(x => x.Status == "Pending")
-                    .SumAsync(x => (decimal?)x.Amount) ?? 0,
+                    PendingRevenue = await db.RevenueEntries
+                        .Where(x => x.Status == "Pending")
+                        .SumAsync(x => (decimal?)x.Amount) ?? 0,
 
-                InvoiceCount = await _db.RevenueEntries
-                    .Where(x => x.Status == "Invoiced")
-                    .CountAsync(),
+                    InvoiceCount = await db.RevenueEntries
+                        .Where(x => x.Status == "Invoiced")
+                        .CountAsync(),
 
-                ReceivedCount = await _db.RevenueEntries
-                    .Where(x => x.Status == "Received")
-                    .CountAsync(),
+                    ReceivedCount = await db.RevenueEntries
+                        .Where(x => x.Status == "Received")
+                        .CountAsync(),
 
-                PendingCount = await _db.RevenueEntries
-                    .Where(x => x.Status == "Pending")
-                    .CountAsync()
-            };
+                    PendingCount = await db.RevenueEntries
+                        .Where(x => x.Status == "Pending")
+                        .CountAsync()
+                };
+
+                cache.Set(cacheKey, dashboard, TimeSpan.FromMinutes(5));
+            }
 
             return ApiResponseHelper.SuccessRes(
                 dashboard,
-                "Dashboard fetched successfully"
-            );
+                "Dashboard fetched successfully");
         }
     }
 }

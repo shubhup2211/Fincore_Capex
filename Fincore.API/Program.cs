@@ -27,10 +27,13 @@ b => b.MigrationsAssembly("Fincore.Infrastructure")));
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IDocumentTypeService,DocumentTypeService>();
 builder.Services.AddScoped<IExecutiveService, ExecutiveService>();
+builder.Services.AddScoped<IFinanceService, FinanceService>();
+builder.Services.AddScoped<IProcurementService, ProcurementService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IMasterType, MasterTypeService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-
+builder.Services.AddMemoryCache();
 
 //Rate limitng
 builder.Services.AddRateLimiter(options =>
