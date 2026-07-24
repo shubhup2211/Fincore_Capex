@@ -233,7 +233,9 @@ namespace Fincore.Infrastructure.Services.PaymentModule
             {
                 if (data.ApprovalStatus == "Approved")
                     throw new Exception("Payment is already approved.");
-                data.ApprovedBy = 1;                                                                                //change by using jwt
+                data.ApprovedBy = 1;
+                data.ApprovalStatus = "Approved";
+                //change by using jwt
             }
             else
             {
