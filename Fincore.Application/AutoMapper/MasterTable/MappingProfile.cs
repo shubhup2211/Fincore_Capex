@@ -85,6 +85,56 @@ namespace Fincore.Application.AutoMapper.MasterTable
                     opt => opt.Ignore())
                 .ForMember(dest => dest.Role,
                     opt => opt.Ignore());
+
+
+            // Permission Mapping
+            CreateMap<Permission, PermissionDto>()
+                .ForMember(dest => dest.RoleName,
+                    opt => opt.MapFrom(src => src.Role != null
+                        ? src.Role.RoleName
+                        : null))
+                .ForMember(dest => dest.MasterTypeName,
+                    opt => opt.MapFrom(src => src.MasterType != null
+                        ? src.MasterType.MasterTypeName
+                        : null));
+
+
+            CreateMap<CreatePermissionDto, Permission>()
+                .ForMember(dest => dest.PermissionId,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedAt,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedBy,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.Role,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.MasterType,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedByUser,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedByUser,
+                    opt => opt.Ignore());
+
+
+            CreateMap<UpdatePermissionDto, Permission>()
+                .ForMember(dest => dest.PermissionId,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedBy,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedAt,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.Role,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.MasterType,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedByUser,
+                    opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedByUser,
+                    opt => opt.Ignore());
         }
     }
 }
