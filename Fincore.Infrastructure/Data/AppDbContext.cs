@@ -251,24 +251,44 @@ namespace Fincore.Infrastructure.Data
             modelBuilder.Entity<Employee>(entity =>
             {
                 entity.HasKey(e => e.EmployeeId);
-                entity.Property(e => e.EmployeeCode).IsRequired().HasMaxLength(50);
-                entity.HasIndex(e => e.EmployeeCode).IsUnique();
 
+                entity.Property(e => e.EmployeeCode)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.HasIndex(e => e.EmployeeCode)
+                    .IsUnique();
+
+
+                // Employee -> User
                 entity.HasOne(e => e.User)
                     .WithMany()
                     .HasForeignKey(e => e.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+
+                // Employee -> Department
                 entity.HasOne(e => e.Department)
                     .WithMany(d => d.Employees)
                     .HasForeignKey(e => e.DepartmentId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+
+                // Employee -> Role (Designation)
+                entity.HasOne(e => e.DesignationRole)
+                    .WithMany()
+                    .HasForeignKey(e => e.Designation)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+
+                // Employee -> Company
                 entity.HasOne(e => e.Company)
                     .WithMany(c => c.Employees)
                     .HasForeignKey(e => e.CompanyId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+
+                // Employee -> Reporting Manager
                 entity.HasOne(e => e.ReportingManagerEmployee)
                     .WithMany(m => m.Subordinates)
                     .HasForeignKey(e => e.ReportingManager)

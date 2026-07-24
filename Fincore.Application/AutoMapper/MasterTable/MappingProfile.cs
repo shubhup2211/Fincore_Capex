@@ -188,6 +188,99 @@ namespace Fincore.Application.AutoMapper.MasterTable
                     opt => opt.Ignore())
                 .ForMember(dest => dest.ApprovalFlows,
                     opt => opt.Ignore());
+
+
+            // Employee Mapping
+            CreateMap<Employee, EmployeeDto>()
+
+                .ForMember(dest => dest.UserName,
+                    opt => opt.MapFrom(src =>
+                        src.User != null
+                            ? src.User.FullName
+                            : null))
+
+                .ForMember(dest => dest.DepartmentName,
+                    opt => opt.MapFrom(src =>
+                        src.Department != null
+                            ? src.Department.DepartmentName
+                            : null))
+
+                .ForMember(dest => dest.DesignationName,
+                    opt => opt.MapFrom(src =>
+                        src.DesignationRole != null
+                            ? src.DesignationRole.RoleName
+                            : null))
+
+                .ForMember(dest => dest.CompanyName,
+                    opt => opt.MapFrom(src =>
+                        src.Company != null
+                            ? src.Company.CompanyName
+                            : null))
+
+                .ForMember(dest => dest.ReportingManagerName,
+                    opt => opt.MapFrom(src =>
+                        src.ReportingManagerEmployee != null &&
+                        src.ReportingManagerEmployee.User != null
+                            ? src.ReportingManagerEmployee.User.FullName
+                            : null));
+
+
+            CreateMap<CreateEmployeeDto, Employee>()
+                .ForMember(dest => dest.EmployeeId,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.User,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Department,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.DesignationRole,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Company,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.ReportingManagerEmployee,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Subordinates,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.RFQsCreated,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.GRNsCreated,
+                    opt => opt.Ignore());
+
+
+            CreateMap<UpdateEmployeeDto, Employee>()
+                .ForMember(dest => dest.EmployeeId,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.User,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Department,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.DesignationRole,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Company,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.ReportingManagerEmployee,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Subordinates,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.RFQsCreated,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.GRNsCreated,
+                    opt => opt.Ignore());
         }
     }
 }
