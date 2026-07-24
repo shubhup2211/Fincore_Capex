@@ -338,6 +338,169 @@ namespace Fincore.Application.AutoMapper.MasterTable
 
                 .ForMember(dest => dest.Payments,
                     opt => opt.Ignore());
+
+
+            // Vendor Mapping
+            CreateMap<Vendor, VendorDto>()
+
+                .ForMember(dest => dest.VendorCategoryName,
+                    opt => opt.MapFrom(src =>
+                        src.VendorCategory != null
+                            ? src.VendorCategory.CategoryName
+                            : null))
+
+                .ForMember(dest => dest.CompanyName,
+                    opt => opt.MapFrom(src =>
+                        src.Company != null
+                            ? src.Company.CompanyName
+                            : null))
+
+                .ForMember(dest => dest.CreatedByName,
+                    opt => opt.MapFrom(src =>
+                        src.CreatedByUser != null
+                            ? src.CreatedByUser.FullName
+                            : null))
+
+                .ForMember(dest => dest.ModifiedByName,
+                    opt => opt.MapFrom(src =>
+                        src.ModifiedByUser != null
+                            ? src.ModifiedByUser.FullName
+                            : null));
+
+
+            CreateMap<CreateVendorDto, Vendor>()
+                .ForMember(dest => dest.VendorId,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.CreatedAt,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.ModifiedAt,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.ModifiedBy,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.VendorCategory,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Company,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.CreatedByUser,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.ModifiedByUser,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.PurchaseRequisitions,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.RFQs,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.RFQVendors,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Quotations,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.VendorSelections,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.GRNs,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Assets,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.WorkOrders,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.APInvoices,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Payments,
+                    opt => opt.Ignore());
+
+
+            CreateMap<UpdateVendorDto, Vendor>()
+                .ForMember(dest => dest.VendorId,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.CreatedAt,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.CreatedBy,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.ModifiedAt,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.VendorCategory,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Company,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.CreatedByUser,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.ModifiedByUser,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.PurchaseRequisitions,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.RFQs,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.RFQVendors,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Quotations,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.VendorSelections,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.GRNs,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Assets,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.WorkOrders,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.APInvoices,
+                    opt => opt.Ignore())
+
+                .ForMember(dest => dest.Payments,
+                    opt => opt.Ignore());
+
+
+
+            // VendorCategory Mapping
+            CreateMap<CreateVendorCategoryDto, VendorCategory>();
+
+            CreateMap<UpdateVendorCategoryDto, VendorCategory>();
+
+            CreateMap<VendorCategory, VendorCategoryDto>()
+                .ForMember(
+                    dest => dest.CreatedByName,
+                    opt => opt.MapFrom(src =>
+                        src.CreatedByUser != null
+                            ? src.CreatedByUser.FullName
+                            : null))
+                .ForMember(
+                    dest => dest.ModifiedByName,
+                    opt => opt.MapFrom(src =>
+                        src.ModifiedByUser != null
+                            ? src.ModifiedByUser.FullName
+                            : null));
+
+
         }
     }
 }

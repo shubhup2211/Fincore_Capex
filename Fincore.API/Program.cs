@@ -56,8 +56,8 @@ builder.Services.AddScoped<IPermissionService, PermissionService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
-
-
+builder.Services.AddScoped<IVendorService, VendorService>();
+builder.Services.AddScoped<IVendorCategoryService, VendorCategoryService>();
 
 var app = builder.Build();
 
