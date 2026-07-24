@@ -42,6 +42,9 @@ namespace Fincore.Domain.Models
         public DateTime? LastLogin { get; set; }
         public string RefreshToken { get; set; }
 
+        public bool Is2FAEnabled { get; set; } = false;
+        public string? TwoFactorSecretKey { get; set; }
+
         [Required]
         public byte IsActive { get; set; }
 

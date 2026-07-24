@@ -4,15 +4,18 @@ using Fincore.Application.Interfaces.IMasterTable;
 using Fincore.Domain.Enums;
 using Fincore.Infrastructure.CommonHelper;
 using Fincore.Infrastructure.Services.MasterTable;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NPOI.SS.UserModel;
 
+
 namespace Fincore.API.Controllers.MasterTable
 {
     [Route("api/v1/accountmasters")]
     [ApiController]
+    [Authorize]
     public class AccountMastersController : ControllerBase
     {
         private readonly IAccountMasterService _service;

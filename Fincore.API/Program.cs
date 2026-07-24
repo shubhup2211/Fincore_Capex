@@ -15,6 +15,13 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using Fincore.Application.Interfaces;
+using Fincore.Infrastructure.Services;
+using Fincore.Application;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Fincore.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +37,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("dbconn"),
         b => b.MigrationsAssembly("Fincore.Infrastructure")));
 
-
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 // ---------------------- AutoMapper ----------------------
 builder.Services.AddAutoMapper(typeof(AccountsMasterMapper));
 builder.Services.AddAutoMapper(typeof(PaymentMapper));
@@ -41,6 +49,30 @@ builder.Services.AddScoped<IAccountMasterService, AccountMasterService>();
 
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IJournalEntryService, JournalEntryService>();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IJwtTokenHelper, JwtTokenHelper>();
+builder.Services.AddScoped<ITwoFactorHelper, TwoFactorHelper>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
 
 // ---------------------- Rate Limiting ----------------------
 builder.Services.AddRateLimiter(options =>
@@ -77,7 +109,7 @@ if (app.Environment.IsDevelopment())
 // await DatabaseSeeder.SeedAsync(app.Services);
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseRateLimiter();
