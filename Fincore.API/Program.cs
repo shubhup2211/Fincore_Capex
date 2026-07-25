@@ -168,10 +168,15 @@ builder.Services.AddScoped<IQuotationService, QuotationService>();
 builder.Services.AddScoped<IQuotationItemService, QuotationItemService>();
 builder.Services.AddScoped<IVendorSelectionService, VendorSelectionService>();
 builder.Services.AddScoped<IApprovalFlowService, ApprovalFlowService>();
-
+builder.Services.AddScoped<IOpexRequestService, OpexRequestService>();
+builder.Services.AddScoped<IExpenseClaimService, ExpenseClaimService>();
+builder.Services.AddScoped<IWorkOrderService, WorkOrderService>();
+builder.Services.AddScoped<IBudgetCategoryService, BudgetCategoryService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<IBudgetLineService, BudgetLineService>();
 
 builder.Services.AddAutoMapper(typeof(AMCapexRequest));
-
+var app= builder.Build();
 // -------------------------
 // Configure HTTP Pipeline
 // -------------------------

@@ -18,14 +18,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Fincore.Application\Fincore.Application.csproj" />
-    <ProjectReference Include="..\Fincore.Infrastructure\Fincore.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Controllers\MasterTable\" />
     <Folder Include="Controllers\Logs\" />
     <Folder Include="Controllers\Opex\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Fincore.Application\Fincore.Application.csproj" />
+    <ProjectReference Include="..\Fincore.Infrastructure\Fincore.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
