@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Fincore.Application.Interfaces.Dashboard
 {
-    public interface IBudgetService
+    public interface IDashboardBudgetService
     {
         Task<ApiResponse<BudgetDashboardDto>> GetBudgetDashboard();
     }

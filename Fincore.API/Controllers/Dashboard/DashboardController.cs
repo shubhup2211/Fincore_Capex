@@ -11,9 +11,9 @@ namespace Fincore.API.Controllers.Dashboard
         IExecutiveService erepo;
         IFinanceService frepo;
         IProcurementService prepo;
-        IBudgetService brepo;
+        IDashboardBudgetService brepo;
 
-        public DashboardController(IExecutiveService erepo,IFinanceService frepo,IProcurementService prepo,IBudgetService brepo)
+        public DashboardController(IExecutiveService erepo,IFinanceService frepo,IProcurementService prepo,IDashboardBudgetService brepo)
         {
             this.erepo = erepo;
             this.frepo = frepo;

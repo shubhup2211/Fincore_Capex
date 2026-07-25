@@ -7,11 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fincore.Infrastructure.Services.Dashboard
 {
-    public class BudgetService : IBudgetService
+    public class DashboardBudgetService : IDashboardBudgetService
     {
          AppDbContext db;
 
-        public BudgetService(AppDbContext db)
+        public DashboardBudgetService(AppDbContext db)
         {
             this.db = db;
         }

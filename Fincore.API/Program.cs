@@ -49,6 +49,8 @@ using Fincore.Infrastructure.Services.Budget;
 using Fincore.Application.Interfaces.BudgetLine;
 using Fincore.Infrastructure.Services.BudgetLine;
 using Fincore.Application.Mapping;
+using Fincore.Application.Interfaces.Dashboard;
+using Fincore.Infrastructure.Services.Dashboard;
 
 
 
@@ -156,7 +158,7 @@ builder.Services.AddScoped<IDocumentTypeService,DocumentTypeService>();
 builder.Services.AddScoped<IExecutiveService, ExecutiveService>();
 builder.Services.AddScoped<IFinanceService, FinanceService>();
 builder.Services.AddScoped<IProcurementService, ProcurementService>();
-builder.Services.AddScoped<IBudgetService, BudgetService>();
+
 builder.Services.AddScoped<IMasterType, MasterTypeService>();
 builder.Services.AddAutoMapper(typeof(DocumentMappingProfile));
 
@@ -209,6 +211,8 @@ builder.Services.AddScoped<IExpenseClaimService, ExpenseClaimService>();
 builder.Services.AddScoped<IWorkOrderService, WorkOrderService>();
 builder.Services.AddScoped<IBudgetCategoryService, BudgetCategoryService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<IDashboardBudgetService, DashboardBudgetService>();
+
 builder.Services.AddScoped<IBudgetLineService, BudgetLineService>();
 
 builder.Services.AddAutoMapper(typeof(MasterTableMappingProfile));
