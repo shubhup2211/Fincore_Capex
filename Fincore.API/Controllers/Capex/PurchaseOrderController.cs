@@ -61,5 +61,69 @@ namespace Fincore.API.Controllers.Capex
         {
             return Ok(await service.DeletePurchaseOrder(id));
         }
+
+
+
+        [HttpPost("{id}/approve")]
+        public async Task<IActionResult> ApprovePurchaseOrder(int id)
+        {
+            return Ok(await service.ApprovePurchaseOrder(id));
+        }
+
+        [HttpGet("status/{status}")]
+        public async Task<IActionResult> GetPurchaseOrderByStatus(
+                    string status,
+                    int page = 1,
+                    int pageSize = 10)
+        {
+            return Ok(await service.GetPurchaseOrderByStatus(status, page, pageSize));
+        }
+
+        [HttpPost("{id}/cancel")]
+        public async Task<IActionResult> CancelPurchaseOrder(int id)
+        {
+            return Ok(await service.CancelPurchaseOrder(id));
+        }
+
+        [HttpPost("{id}/close")]
+        public async Task<IActionResult> ClosePurchaseOrder(int id)
+        {
+            return Ok(await service.ClosePurchaseOrder(id));
+        }
+
+        [HttpGet("{id}/pdf")]
+        public async Task<IActionResult> GeneratePdf(int id)
+        {
+
+            var pdf = await service.GeneratePurchaseOrderPdf(id);
+
+
+            if (pdf == null)
+            {
+                return NotFound(
+                    "Purchase Order Not Found"
+                );
+            }
+
+
+            return File(
+                pdf,
+                "application/pdf",
+                $"PurchaseOrder_{id}.pdf"
+            );
+
+        }
+
+
+
+        [HttpGet("filter")]
+        public async Task<IActionResult> FilterPurchaseOrder([FromQuery] PurchaseOrderFilterDTO filter)
+        {
+            return Ok(
+                await service.FilterPurchaseOrders(filter)
+            );
+        }
+
+        
     }
 }

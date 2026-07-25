@@ -6,9 +6,12 @@ using Fincore.Infrastructure.Services.Capex;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.RateLimiting;
+using QuestPDF.Infrastructure;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
-
+QuestPDF.Settings.License = LicenseType.Community;
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -38,8 +41,17 @@ builder.Services.AddRateLimiter(options =>
 });
 
 builder.Services.AddMemoryCache();
-builder.Services.AddAutoMapper(typeof(MapperConfigPurchaseOrder));
+builder.Services.AddAutoMapper(
+    typeof(MapperConfigPurchaseOrder),
+    typeof(MapperConfigPurchaseOrderItem),
+    typeof(MapperConfigAsset),
+    typeof(MapperConfigGRN)
+);
+
 builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
+builder.Services.AddScoped<IPurchaseOrderItemService, PurchaseOrderItemService>();
+builder.Services.AddScoped<IAssetService, AssetService>();
+builder.Services.AddScoped<IGRNService, GRNService>();
 
 var app = builder.Build();
 

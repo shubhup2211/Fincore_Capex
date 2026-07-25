@@ -12,15 +12,15 @@ namespace Fincore.Application.DTO.Capex
     public class PurchaseOrderDTO
     {
         public int POId { get; set; }
-        public string POCode { get; set; }
+        public string? POCode { get; set; }
         public int PurchaseRequisitionId { get; set; }
         public int QuotationId { get; set; }
         public int RequestedBy { get; set; }
         public DateTime? RequiredTillDate { get; set; }
         public DateTime? OrderDate { get; set; }
-        public string ApprovalStatus { get; set; }
+        public string? ApprovalStatus { get; set; }
         public decimal Amount { get; set; }
-        public int ApprovedBy { get; set; }
+        public int? ApprovedBy { get; set; }
         public byte IsActive { get; set; }
         public DateTime? ApprovedAt { get; set; }
         public DateTime? CreatedAt { get; set; }
