@@ -5,14 +5,18 @@ using Fincore.Application.AutoMapper.MasterTable;
 using Fincore.Application.Interfaces.IMasterTable;
 using Fincore.Application.Interfaces.IPayment;
 
+using Fincore.Application.AutoMapper.Capex;
+using Fincore.Application.Interfaces.ICapex;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+using Fincore.Infrastructure.Services.Capex;
 
 using Fincore.Infrastructure.Services.MasterTable;
 using Fincore.Infrastructure.Services.PaymentModule;
 
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using QuestPDF.Infrastructure;
@@ -140,6 +144,19 @@ builder.Services.AddControllers()
     {
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
+
+builder.Services.AddScoped<ICapexReq, CapexReq>();
+builder.Services.AddScoped<IPRService, PRService>();
+builder.Services.AddScoped<IPRItemService, PRItemService>();
+builder.Services.AddScoped<IRFQService, RFQService>();
+builder.Services.AddScoped<IRFQVendorService, RFQVendorService>();
+builder.Services.AddScoped<IQuotationService, QuotationService>();
+builder.Services.AddScoped<IQuotationItemService, QuotationItemService>();
+builder.Services.AddScoped<IVendorSelectionService, VendorSelectionService>();
+builder.Services.AddScoped<IApprovalFlowService, ApprovalFlowService>();
+
+
+builder.Services.AddAutoMapper(typeof(AMCapexRequest));
 
 var app = builder.Build();
 

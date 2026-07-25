@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Fincore.Application.DTO.Capex
+{
+    public class PRItemDTOGet
+    {
+        public int PRItemId { get; set; }
+        public int PurchaseRequisitionId { get; set; }
+        public string PRName { get; set; }
+        public string ItemName { get; set; }
+        public string ItemDescription { get; set; }
+        public string Category { get; set; }
+        public decimal Quantity { get; set; }
+        public string UnitOfMaterial { get; set; }
+
+        public decimal? EstimatedUnitPrice { get; set; }
+        public decimal TaxPercentage { get; set; }
+        public decimal TaxAmount { get; set; }
+        public string ItemStatus { get; set; }
+
+    }
+}
