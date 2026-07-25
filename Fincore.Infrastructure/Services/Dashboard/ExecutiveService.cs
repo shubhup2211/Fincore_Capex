@@ -27,9 +27,11 @@ namespace Fincore.Infrastructure.Services.Dashboard
             {
                 dashboard = new ExecutiveDashboardDto
                 {
-                    TotalRevenue = await db.RevenueEntries.SumAsync(x => x.Amount),
+                    TotalRevenue = await db.RevenueEntries
+                    .SumAsync(x => x.Amount),
 
-                    TotalInvoices = await db.RevenueEntries.CountAsync(),
+                    TotalInvoices = await db.RevenueEntries
+                    .CountAsync(),
 
                     ReceivedRevenue = await db.RevenueEntries
                         .Where(x => x.Status == "Received")

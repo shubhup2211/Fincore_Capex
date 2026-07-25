@@ -148,30 +148,29 @@ public class MasterTypeService : IMasterType
 
         if (data == null)
         {
-            return ApiResponseHelper.Failure<bool>
-            (
+            return ApiResponseHelper.Failure<bool>(
                 "Master Type Not Found",
                 "404",
                 "Invalid Master Type Id"
             );
         }
 
-        db.MasterTypes.Remove(data);
+        bool isUsed = await db.Companies.AnyAsync(x => x.MasterTypeId == id);
 
-        var result = await db.SaveChangesAsync();
-
-        if (result <= 0)
+        if (isUsed)
         {
-            return ApiResponseHelper.Failure<bool>
-            (
-                "Master Type Not Deleted",
-                "500",
-                "Failed to Delete Master Type"
+            return ApiResponseHelper.Failure<bool>(
+                "Master Type cannot be deleted",
+                "400",
+                "This Master Type is assigned to one or more Companies."
             );
         }
 
-        return ApiResponseHelper.SuccessRes
-        (
+        db.MasterTypes.Remove(data);
+
+        await db.SaveChangesAsync();
+
+        return ApiResponseHelper.SuccessRes(
             true,
             "Master Type Deleted Successfully"
         );
