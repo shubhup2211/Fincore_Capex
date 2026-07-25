@@ -41,10 +41,10 @@ namespace Fincore.API.Controllers.MasterTable
                 {
                     success = false,
                     message = "Failed to create account.",
-                    Error = new ApiError
+                    error = new ApiError
                     {
-                        code = "ACCOUNT_CREATION_FAILED",
-                        details = ex.Message
+                        Code = "ACCOUNT_CREATION_FAILED",
+                        Details = ex.Message
                     }
                 });
             }

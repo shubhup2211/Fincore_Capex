@@ -12,11 +12,11 @@ namespace Fincore.Infrastructure.CommonHelper
         {
             return new ApiResponse<T>
             {
-                Success = true,
-                Message = message,
-                Data = data,
-                Metadata = metadata,
-                TotalNumberRecord = totalRecord
+                success = true,
+                message = message,
+                data = data,
+                metadata = metadata,
+                totalNumberRecord = totalRecord
             };
         }
 
@@ -27,9 +27,9 @@ namespace Fincore.Infrastructure.CommonHelper
         {
             return new ApiResponse<T>
             {
-                Success = false,
-                Message = message,
-                Error = new ApiError
+                success = false,
+                message = message,
+                error = new ApiError
                 {
                     Code = errorCode,
                     Details = details

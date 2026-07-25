@@ -27,10 +27,10 @@ namespace Fincore.API.CommonHelper
             {
                 success = false,
                 message = Message,
-                Error = new ApiError
+                error = new ApiError
                 {
-                    code = ErrorCode,
-                    details = Details
+                    Code = ErrorCode,
+                    Details = Details
                 }
             };
 

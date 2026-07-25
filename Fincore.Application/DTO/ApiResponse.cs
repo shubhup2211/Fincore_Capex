@@ -2,16 +2,16 @@
 {
     public class ApiResponse<T>
     {
-        public bool Success { get; set; }
+        public bool success { get; set; }
 
-        public string Message { get; set; } = string.Empty;
+        public string message { get; set; } = string.Empty;
 
-        public T? Data { get; set; }
+        public T? data { get; set; }
 
-        public object? Metadata { get; set; }
+        public object? metadata { get; set; }
 
-        public int? TotalNumberRecord { get; set; }
+        public int? totalNumberRecord { get; set; }
 
-        public ApiError? Error { get; set; }
+        public ApiError? error { get; set; }
     }
 }

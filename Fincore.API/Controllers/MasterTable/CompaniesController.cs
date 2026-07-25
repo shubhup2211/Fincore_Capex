@@ -24,7 +24,7 @@ namespace Fincore.API.Controllers.MasterTable
                 return Ok(result);
             }
 
-            return result.Error?.code switch
+            return result.error?.Code switch
             {
                 "404" => NotFound(result),
                 "409" => Conflict(result),
