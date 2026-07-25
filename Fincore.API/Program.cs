@@ -1,3 +1,5 @@
+using Fincore.Application.AutoMapper;
+using Fincore.Application.Interfaces.Opex;
 using Fincore.Application.AutoMapper.MasterTable;
 using Fincore.Application.Interfaces.IMasterTable;
 using Fincore.Application.Interfaces.IPayment;
@@ -14,6 +16,7 @@ using Fincore.Infrastructure.Services.Capex;
 using Fincore.Infrastructure.Services.MasterTable;
 using Fincore.Infrastructure.Services.PaymentModule;
 
+using Fincore.Infrastructure.Services.Opex;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +33,16 @@ using Fincore.Infrastructure;
 using Fincore.Application.AutoMapper.Capex;
 using Fincore.Application.Interfaces.ICapex;
 using Fincore.Infrastructure.Services.Capex;
+using Fincore.Application.Interfaces.ExpenseClaim;
+using Fincore.Infrastructure.Services.ExpenseClaim;
+using Fincore.Application.Interfaces.WorkOrder;
+using Fincore.Infrastructure.Services.WorkOrder;
+using Fincore.Application.Interfaces.BudgetCategory;
+using Fincore.Infrastructure.Services.BudgetCategory;
+using Fincore.Application.Interfaces.Budget;
+using Fincore.Infrastructure.Services.Budget;
+using Fincore.Application.Interfaces.BudgetLine;
+using Fincore.Infrastructure.Services.BudgetLine;
 
 
 
@@ -70,6 +83,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("dbconn"),
@@ -158,9 +172,10 @@ builder.Services.AddScoped<IApprovalFlowService, ApprovalFlowService>();
 
 builder.Services.AddAutoMapper(typeof(AMCapexRequest));
 
-var app = builder.Build();
+// -------------------------
+// Configure HTTP Pipeline
+// -------------------------
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -171,10 +186,11 @@ if (app.Environment.IsDevelopment())
 // await DatabaseSeeder.SeedAsync(app.Services);
 
 app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.UseRateLimiter();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
