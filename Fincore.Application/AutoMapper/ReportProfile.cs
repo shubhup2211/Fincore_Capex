@@ -1,11 +1,8 @@
 ﻿using AutoMapper;
 using Fincore.Application.DTO.Reports;
 using Fincore.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+
 
 namespace Fincore.Application.AutoMapper
 {
@@ -28,14 +25,21 @@ namespace Fincore.Application.AutoMapper
             .ForMember(dest => dest.Department,opt => opt.MapFrom(src => src.OpexRequest.BudgetLine.BudgetCategory.Department.DepartmentName));
 
             // Vendpr
-            CreateMap<Payment, VendorSpendDTO>()
-               .ForMember(dest => dest.VendorCode,opt => opt.MapFrom(src => src.Vendor.VendorCode))
-               .ForMember(dest => dest.CompanyName,opt => opt.MapFrom(src => src.Vendor.Company.CompanyName))
-               .ForMember(dest => dest.APInvoiceNumber,opt => opt.MapFrom(src => src.APInvoice.InvoiceNumber))
-               .ForMember(dest => dest.InvoiceDate,opt => opt.MapFrom(src => src.APInvoice.InvoiceDate))
-               .ForMember(dest => dest.DueDate,opt => opt.MapFrom(src => src.APInvoice.DueDate))
-               .ForMember(dest => dest.PaymentStatus,opt => opt.MapFrom(src => src.APInvoice.PaymentStatus))
-               .ForMember(dest => dest.ApprovalStatus,opt => opt.MapFrom(src => src.ApprovalStatus));
+            CreateMap<APInvoice, VendorSpendDTO>()
+                .ForMember(d => d.VendorCode,
+                 o => o.MapFrom(s => s.Vendor.VendorCode))
+                .ForMember(d => d.CompanyName,
+                o => o.MapFrom(s => s.Vendor.Company.CompanyName))
+                .ForMember(d => d.APInvoiceNumber,
+                 o => o.MapFrom(s => s.InvoiceNumber))
+                .ForMember(d => d.InvoiceDate,
+                    o => o.MapFrom(s => s.InvoiceDate))
+                .ForMember(d => d.DueDate,
+                o => o.MapFrom(s => s.DueDate))
+                .ForMember(d => d.PaymentStatus,
+                o => o.MapFrom(s => s.PaymentStatus))
+                .ForMember(d => d.ApprovalStatus,
+                o => o.MapFrom(s => s.ApprovalStatus));
 
             //Capex
             CreateMap<CapexRequest, CapexReportDTO>()

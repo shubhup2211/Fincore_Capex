@@ -233,6 +233,8 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<IVendorCategoryService, VendorCategoryService>();
 builder.Services.AddAutoMapper(typeof(AMCapexRequest));
+builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IGeneralLedgerService, GeneralLedgerService>();
 var app = builder.Build();
 
 
