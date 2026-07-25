@@ -11,9 +11,9 @@ using Fincore.Domain.Models;
 
 namespace Fincore.Application.Mapping
 {
-    public class MappingProfile : Profile
+    public class LogsMappingProfile : Profile
     {
-        public MappingProfile()
+        public LogsMappingProfile()
         {
             // Country
 
