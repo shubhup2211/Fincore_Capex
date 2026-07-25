@@ -9,8 +9,13 @@ using Fincore.Application.Interfaces.IPayment;
 
 using Fincore.Application.AutoMapper.Capex;
 using Fincore.Application.Interfaces.ICapex;
+using Fincore.Application.AutoMapper.MasterTable;
+using Fincore.Application.Interfaces.IMasterTable;
+using Fincore.Domain.Models;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+using Fincore.Infrastructure.Services.MasterTable;
+using Microsoft.AspNetCore.Identity;
 using Fincore.Infrastructure.Services.Capex;
 
 using Fincore.Infrastructure.Services.MasterTable;
@@ -175,6 +180,25 @@ builder.Services.AddScoped<IBudgetCategoryService, BudgetCategoryService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IBudgetLineService, BudgetLineService>();
 
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+
+
+
+
+
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IDepartmentService, DepartmentService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<IPermissionService, PermissionService>();
+builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IVendorService, VendorService>();
+builder.Services.AddScoped<IVendorCategoryService, VendorCategoryService>();
+
+var app = builder.Build();
 builder.Services.AddAutoMapper(typeof(AMCapexRequest));
 var app= builder.Build();
 // -------------------------
@@ -187,9 +211,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Uncomment only if your team still wants automatic seeding
-// await DatabaseSeeder.SeedAsync(app.Services);
-
 app.UseHttpsRedirection();
 
 app.UseRateLimiter();
@@ -197,6 +218,9 @@ app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers();
+app.UseRateLimiter();
+
+app.MapControllers()
+    .RequireRateLimiting("FixedPolicy");
 
 app.Run();

@@ -7,24 +7,32 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="AutoMapper\Capex\" />
+    <Folder Include="AutoMapper\MasterTable\" />
     <Folder Include="AutoMapper\MasterTable\" />
     <Folder Include="AutoMapper\Budget\" />
+    <Folder Include="AutoMapper\Payment\" />
     <Folder Include="AutoMapper\Logs\" />
-    <Folder Include="AutoMapper\Opex\" />
+    <Folder Include="DTO\Capex\" />
+    <Folder Include="DTO\MasterTable\" />
+    <Folder Include="DTO\MasterTable\" />
     <Folder Include="DTO\MasterTable\" />
     <Folder Include="DTO\Budget\" />
     <Folder Include="DTO\Logs\" />
+    <Folder Include="Interfaces\ICapex\" />
+    <Folder Include="Interfaces\IMasterTable\" />
     <Folder Include="DTO\Opex\" />
+    <Folder Include="Interfaces\ICapex\" />
     <Folder Include="Interfaces\IMasterTable\" />
     <Folder Include="Interfaces\IBudget\" />
     <Folder Include="Interfaces\IOpex\" />
     <Folder Include="Interfaces\ILogs\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="Google.Apis.Gmail.v1" Version="1.74.0.4162" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="NPOI" Version="2.8.0" />
   </ItemGroup>
 

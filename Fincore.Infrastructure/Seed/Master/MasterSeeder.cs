@@ -67,6 +67,19 @@ namespace Fincore.Infrastructure.Seed.Master
                 new() { CountryCode = 65,  CountryName = "Singapore",       CurrencyId = Cur("Singapore") },
                 new() { CountryCode = 971, CountryName = "UAE",             CurrencyId = Cur("UAE") },
                 new() { CountryCode = 39,  CountryName = "Italy",           CurrencyId = Cur("Euro") }
+
+                //                new() { CountryCode = "1", CountryName = "United States", ... }
+                //new() { CountryCode = "91", CountryName = "India", ... }
+                //new() { CountryCode = "44", CountryName = "United Kingdom", ... }
+                //new() { CountryCode = "81", CountryName = "Japan", ... }
+                //new() { CountryCode = "61", CountryName = "Australia", ... }
+                //new() { CountryCode = "1", CountryName = "Canada", ... }
+                //new() { CountryCode = "49", CountryName = "Germany", ... }
+                //new() { CountryCode = "33", CountryName = "France", ... }
+                //new() { CountryCode = "41", CountryName = "Switzerland", ... }
+                //new() { CountryCode = "65", CountryName = "Singapore", ... }
+                //new() { CountryCode = "971", CountryName = "UAE", ... }
+                //new() { CountryCode = "39", CountryName = "Italy", ... }
             };
             db.Countries.AddRange(data);
             await db.SaveChangesAsync();

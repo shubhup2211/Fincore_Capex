@@ -14,6 +14,7 @@ namespace Fincore.Domain.Models
         public int CountryId { get; set; }
 
         [Required]
+        //[StringLength(5)]
         public int CountryCode { get; set; }
 
         [Required]
