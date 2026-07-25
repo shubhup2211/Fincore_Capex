@@ -1,7 +1,14 @@
+using Fincore.Application.AutoMapper.Payment;
+using Fincore.Application.Interfaces.IPayment;
+using Fincore.Application.Interfaces.Payment;
+using Fincore.Application.Mapper;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
+using Fincore.Infrastructure.Services.Payment;
+using Fincore.Infrastructure.Services.PaymentModule;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design;
 using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +24,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("dbconn"),
 b => b.MigrationsAssembly("Fincore.Infrastructure")));
 
+builder.Services.AddAutoMapper(typeof(MapperConfigPayment));
+builder.Services.AddAutoMapper(typeof(APInvoiceProfile));
+
+
+builder.Services.AddScoped<IRevenueService, RevenueService>();
+builder.Services.AddScoped<IAPInvoiceService, APInvoiceService>();
+//builder.Services.AddScoped<IARInvoiceService, ARInvoiceService>();
 
 //Rate limitng
 builder.Services.AddRateLimiter(options =>
