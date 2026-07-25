@@ -28,4 +28,13 @@
     <ProjectReference Include="..\Fincore.Infrastructure\Fincore.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\Capex\" />
+    <Folder Include="Controllers\MasterTable\" />
+    <Folder Include="Controllers\Budget\" />
+    <Folder Include="Controllers\Logs\" />
+    <Folder Include="Controllers\Payment\" />
+    <Folder Include="Controllers\Opex\" />
+  </ItemGroup>
+
 </Project>

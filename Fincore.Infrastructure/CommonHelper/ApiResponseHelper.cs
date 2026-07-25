@@ -1,42 +1,40 @@
 ﻿using Fincore.Application.DTO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Fincore.Infrastructure.CommonHelper
 {
     public class ApiResponseHelper
     {
-        public static Application.DTO.ApiResponse<T> SuccessRes<T>(T Data, string Message = "Success", int? TotalRecord = null, object? Metadata = null)
+        public static ApiResponse<T> SuccessRes<T>(
+            T data,
+            string message = "Success",
+            int? totalRecord = null,
+            object? metadata = null)
         {
-            return new Application.DTO.ApiResponse<T>
+            return new ApiResponse<T>
             {
-                success = true,
-                message = Message,
-                data = Data,
-                metadata = Metadata,
-                totalNumberRecord = TotalRecord
+                Success = true,
+                Message = message,
+                Data = data,
+                Metadata = metadata,
+                TotalNumberRecord = totalRecord
             };
         }
 
-        public static Application.DTO.ApiResponse<T> Failure<T>(string Message, string ErrorCode, string Details)
+        public static ApiResponse<T> Failure<T>(
+            string message,
+            string errorCode,
+            string details)
         {
-            return new Application.DTO.ApiResponse<T>
+            return new ApiResponse<T>
             {
-                success = false,
-                message = Message,
+                Success = false,
+                Message = message,
                 Error = new ApiError
                 {
-                    code = ErrorCode,
-                    details = Details
+                    Code = errorCode,
+                    Details = details
                 }
             };
-
-
         }
-
     }
-
 }

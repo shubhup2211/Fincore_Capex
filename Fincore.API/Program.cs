@@ -56,7 +56,16 @@ QuestPDF.Settings.License = LicenseType.Community;
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Learn more about configuring Swagger/OpenAPI
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.SuppressModelStateInvalidFilter = true;
+    })
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -88,7 +97,16 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// Database
+builder.Services.AddScoped<ICityService, CityService>();
+builder.Services.AddScoped<ICountryService, CountryService>();
+builder.Services.AddScoped<IStateService, StateService>();
+builder.Services.AddScoped<ICurrencyService, CurrencyService>();
+builder.Services.AddScoped<IAuditLogService, AuditLogService>();
+builder.Services.AddScoped<IUserActivityLogService, UserActivityLogService>();
+builder.Services.AddScoped<INotificationLogService, NotificationLogService>();
+builder.Services.AddScoped<IApprovalLogService, ApprovalLogService>();
+builder.Services.AddAutoMapper(typeof(LogsMappingProfile));
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("dbconn"),

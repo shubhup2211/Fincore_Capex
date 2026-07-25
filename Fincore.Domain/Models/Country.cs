@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Fincore.Domain.Models
 {
@@ -19,15 +14,17 @@ namespace Fincore.Domain.Models
 
         [Required]
         [StringLength(30)]
-        public string CountryName { get; set; }
+        public string CountryName { get; set; } = string.Empty;
 
         [Required]
         [ForeignKey("Currency")]
         public int CurrencyId { get; set; }
-        public Currency Currency { get; set; }
 
         // Navigation Properties
-        public List<Company> Companies { get; set; }
-        public List<State> States { get; set; }
+        public Currency? Currency { get; set; }
+
+        public List<Company> Companies { get; set; } = new();
+
+        public List<State> States { get; set; } = new();
     }
 }
