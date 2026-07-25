@@ -674,6 +674,11 @@ namespace Fincore.Infrastructure.Data
                     .HasForeignKey(e => e.QuotationId)
                     .OnDelete(DeleteBehavior.Restrict);
 
+                entity.HasOne(e => e.Vendor)
+                    .WithMany(v => v.PurchaseOrders)
+                    .HasForeignKey(e => e.VendorId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
                 entity.HasOne(e => e.RequestedByUser)
                     .WithMany(u => u.PurchaseOrdersRequested)
                     .HasForeignKey(e => e.RequestedBy)

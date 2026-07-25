@@ -349,6 +349,7 @@ namespace Fincore.Infrastructure.Seed.Procurement
                     POCode                 = $"PO-{DateTime.UtcNow.Year}-{i:D4}",
                     PurchaseRequisitionId  = sel.RFQ != null ? sel.RFQ.PurchaseRequisitionId : (int?)null,
                     QuotationId            = sel.QuotationId,
+                    VendorId = sel.SelectedVendorId,
                     RequestedBy            = admin,
                     RequiredTillDate       = now.AddDays(rng.Int(15, 90)),
                     OrderDate              = now.AddDays(-rng.Int(5, 45)),

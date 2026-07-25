@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Fincore.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260722105137_NewTable")]
-    partial class NewTable
+    [Migration("20260725092400_Final")]
+    partial class Final
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.28")
+                .HasAnnotation("ProductVersion", "8.0.29")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -848,18 +848,16 @@ namespace Fincore.Infrastructure.Migrations
 
                     b.HasKey("DepartmentId");
 
-                    b.HasIndex("CompanyId");
-
                     b.HasIndex("CreatedBy");
-
-                    b.HasIndex("DepartmentCode")
-                        .IsUnique();
 
                     b.HasIndex("ManagerId");
 
                     b.HasIndex("MasterTypeId");
 
                     b.HasIndex("ModifiedBy");
+
+                    b.HasIndex("CompanyId", "DepartmentCode")
+                        .IsUnique();
 
                     b.ToTable("Departments");
                 });
@@ -1475,6 +1473,9 @@ namespace Fincore.Infrastructure.Migrations
                     b.Property<DateTime?>("RequiredTillDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("VendorId")
+                        .HasColumnType("int");
+
                     b.HasKey("POId");
 
                     b.HasIndex("ApprovedBy");
@@ -1491,6 +1492,8 @@ namespace Fincore.Infrastructure.Migrations
                     b.HasIndex("QuotationId");
 
                     b.HasIndex("RequestedBy");
+
+                    b.HasIndex("VendorId");
 
                     b.ToTable("PurchaseOrders");
                 });
@@ -2031,6 +2034,9 @@ namespace Fincore.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("Is2FAEnabled")
+                        .HasColumnType("bit");
+
                     b.Property<byte>("IsActive")
                         .HasColumnType("tinyint");
 
@@ -2059,6 +2065,9 @@ namespace Fincore.Infrastructure.Migrations
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
+
+                    b.Property<string>("TwoFactorSecretKey")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserCategory")
                         .IsRequired()
@@ -2774,7 +2783,7 @@ namespace Fincore.Infrastructure.Migrations
                     b.HasOne("Fincore.Domain.Models.Role", "DesignationRole")
                         .WithMany()
                         .HasForeignKey("Designation")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Fincore.Domain.Models.Employee", "ReportingManagerEmployee")
@@ -3030,6 +3039,12 @@ namespace Fincore.Infrastructure.Migrations
                         .HasForeignKey("RequestedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Fincore.Domain.Models.Vendor", "Vendor")
+                        .WithMany("PurchaseOrders")
+                        .HasForeignKey("VendorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("ApprovedByUser");
 
                     b.Navigation("CreatedByUser");
@@ -3041,6 +3056,8 @@ namespace Fincore.Infrastructure.Migrations
                     b.Navigation("Quotation");
 
                     b.Navigation("RequestedByUser");
+
+                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("Fincore.Domain.Models.PurchaseOrderItem", b =>
@@ -3745,6 +3762,8 @@ namespace Fincore.Infrastructure.Migrations
                     b.Navigation("GRNs");
 
                     b.Navigation("Payments");
+
+                    b.Navigation("PurchaseOrders");
 
                     b.Navigation("PurchaseRequisitions");
 

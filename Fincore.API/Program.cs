@@ -259,6 +259,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+await DatabaseSeeder.SeedAsync(app.Services);
 app.UseHttpsRedirection();
 
 app.UseRateLimiter();

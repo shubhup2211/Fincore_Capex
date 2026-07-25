@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Fincore.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class ERPTable : Migration
+    public partial class Final : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -754,6 +754,7 @@ namespace Fincore.Infrastructure.Migrations
                     POCode = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     PurchaseRequisitionId = table.Column<int>(type: "int", nullable: true),
                     QuotationId = table.Column<int>(type: "int", nullable: false),
+                    VendorId = table.Column<int>(type: "int", nullable: false),
                     RequestedBy = table.Column<int>(type: "int", nullable: true),
                     RequiredTillDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1006,6 +1007,8 @@ namespace Fincore.Infrastructure.Migrations
                     Phone = table.Column<string>(type: "nvarchar(12)", maxLength: 12, nullable: false),
                     LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Is2FAEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorSecretKey = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<byte>(type: "tinyint", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1455,20 +1458,15 @@ namespace Fincore.Infrastructure.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Departments_CompanyId",
+                name: "IX_Departments_CompanyId_DepartmentCode",
                 table: "Departments",
-                column: "CompanyId");
+                columns: new[] { "CompanyId", "DepartmentCode" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Departments_CreatedBy",
                 table: "Departments",
                 column: "CreatedBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Departments_DepartmentCode",
-                table: "Departments",
-                column: "DepartmentCode",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Departments_ManagerId",
@@ -1725,6 +1723,11 @@ namespace Fincore.Infrastructure.Migrations
                 name: "IX_PurchaseOrders_RequestedBy",
                 table: "PurchaseOrders",
                 column: "RequestedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseOrders_VendorId",
+                table: "PurchaseOrders",
+                column: "VendorId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PurchaseRequisitionItems_CategoryId",
@@ -2309,7 +2312,7 @@ namespace Fincore.Infrastructure.Migrations
                 column: "Designation",
                 principalTable: "Roles",
                 principalColumn: "RoleId",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Employees_Users_UserId",
@@ -2509,6 +2512,14 @@ namespace Fincore.Infrastructure.Migrations
                 column: "RequestedBy",
                 principalTable: "Users",
                 principalColumn: "UserId",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_PurchaseOrders_Vendors_VendorId",
+                table: "PurchaseOrders",
+                column: "VendorId",
+                principalTable: "Vendors",
+                principalColumn: "VendorId",
                 onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(

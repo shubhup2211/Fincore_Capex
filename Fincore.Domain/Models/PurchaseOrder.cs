@@ -26,6 +26,11 @@ namespace Fincore.Domain.Models
         public int QuotationId { get; set; }
         public Quotation Quotation { get; set; }
 
+        [Required]
+        [ForeignKey("Vendor")]
+        public int VendorId { get; set; }
+        public Vendor Vendor { get; set; }
+
         [ForeignKey("RequestedByUser")]
         public int? RequestedBy { get; set; }
         public User RequestedByUser { get; set; }

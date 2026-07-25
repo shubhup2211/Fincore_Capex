@@ -8,13 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fincore.Infrastructure.Seed.Authentication
 {
-    /// <summary>
-    /// Phase 2 – Roles seeder.
-    /// Handles the Role &lt;-&gt; User circular dependency by
-    /// bootstrapping the first Role &amp; SuperAdmin User via raw SQL
-    /// with FK constraints temporarily disabled.
-    /// After bootstrap, the remaining roles are inserted normally.
-    /// </summary>
     public static class RoleSeeder
     {
         public const int BootstrapRoleId = 1;   // SuperAdmin
@@ -22,36 +15,55 @@ namespace Fincore.Infrastructure.Seed.Authentication
 
         public static async Task BootstrapAdminAsync(AppDbContext db)
         {
-            if (await db.Roles.AnyAsync() || await db.Users.AnyAsync()) return;
+            // FIX: check Role 1 and User 1 INDEPENDENTLY, not "any row anywhere".
+            // This makes the seeder self-healing: if a previous run left Roles
+            // seeded but Users missing (exactly your current state), this will
+            // detect the gap and insert only what's missing.
+            bool roleExists = await db.Roles.AnyAsync(r => r.RoleId == BootstrapRoleId);
+            bool userExists = await db.Users.AnyAsync(u => u.UserId == BootstrapUserId);
 
-            // Insert the SuperAdmin Role + SuperAdmin User atomically with
-            // FK constraints disabled so the circular reference resolves.
+            if (roleExists && userExists) return; // fully bootstrapped, nothing to do
+
             var now = DateTime.UtcNow;
             var passwordHash = "Admin@123"; // plain – user will hash later
 
-            var sql = $@"
-                ALTER TABLE [Roles] NOCHECK CONSTRAINT ALL;
-                ALTER TABLE [Users] NOCHECK CONSTRAINT ALL;
+            // Build only the INSERT statements that are actually needed.
+            var sqlParts = new List<string>
+            {
+                "BEGIN TRAN;",
+                "ALTER TABLE [Roles] NOCHECK CONSTRAINT ALL;",
+                "ALTER TABLE [Users] NOCHECK CONSTRAINT ALL;"
+            };
 
-                SET IDENTITY_INSERT [Roles] ON;
-                INSERT INTO [Roles] ([RoleId], [RoleName], [Description], [UserId], [IsActive], [CreatedAt], [ModifiedAt], [CreatedBy], [ModifiedBy])
-                VALUES ({BootstrapRoleId}, N'SuperAdmin', N'System super administrator with unrestricted access', NULL, 1, '{now:yyyy-MM-dd HH:mm:ss}', '{now:yyyy-MM-dd HH:mm:ss}', {BootstrapUserId}, {BootstrapUserId});
-                SET IDENTITY_INSERT [Roles] OFF;
+            if (!roleExists)
+            {
+                sqlParts.Add($@"
+                    SET IDENTITY_INSERT [Roles] ON;
+                    INSERT INTO [Roles] ([RoleId], [RoleName], [Description], [UserId], [IsActive], [CreatedAt], [ModifiedAt], [CreatedBy], [ModifiedBy])
+                    VALUES ({BootstrapRoleId}, N'SuperAdmin', N'System super administrator with unrestricted access', NULL, 1, '{now:yyyy-MM-dd HH:mm:ss}', '{now:yyyy-MM-dd HH:mm:ss}', {BootstrapUserId}, {BootstrapUserId});
+                    SET IDENTITY_INSERT [Roles] OFF;");
+            }
 
-                SET IDENTITY_INSERT [Users] ON;
-                INSERT INTO [Users] ([UserId], [RoleId], [FullName], [Email], [PasswordHash], [User Category], [Phone], [LastLogin], [RefreshToken], [IsActive], [CreatedAt], [ModifiedAt], [CreatedBy], [ModifiedBy])
-                VALUES ({BootstrapUserId}, {BootstrapRoleId}, N'Super Admin', N'admin@fincore.com', N'{passwordHash}', N'Employee', N'9000000001', '{now:yyyy-MM-dd HH:mm:ss}', N'', 1, '{now:yyyy-MM-dd HH:mm:ss}', '{now:yyyy-MM-dd HH:mm:ss}', {BootstrapUserId}, {BootstrapUserId});
-                SET IDENTITY_INSERT [Users] OFF;
+            if (!userExists)
+            {
+                sqlParts.Add($@"
+        SET IDENTITY_INSERT [Users] ON;
+        INSERT INTO [Users] ([UserId], [RoleId], [FullName], [Email], [PasswordHash], [User Category], [Phone], [LastLogin], [RefreshToken], [Is2FAEnabled], [TwoFactorSecretKey], [IsActive], [CreatedAt], [ModifiedAt], [CreatedBy], [ModifiedBy])
+        VALUES ({BootstrapUserId}, {BootstrapRoleId}, N'Super Admin', N'admin@fincore.com', N'{passwordHash}', N'Employee', N'9000000001', '{now:yyyy-MM-dd HH:mm:ss}', N'', 0, NULL, 1, '{now:yyyy-MM-dd HH:mm:ss}', '{now:yyyy-MM-dd HH:mm:ss}', {BootstrapUserId}, {BootstrapUserId});
+        SET IDENTITY_INSERT [Users] OFF;");
+            }
 
-                ALTER TABLE [Roles] WITH CHECK CHECK CONSTRAINT ALL;
-                ALTER TABLE [Users] WITH CHECK CHECK CONSTRAINT ALL;";
+            sqlParts.Add("ALTER TABLE [Roles] WITH CHECK CHECK CONSTRAINT ALL;");
+            sqlParts.Add("ALTER TABLE [Users] WITH CHECK CHECK CONSTRAINT ALL;");
+            sqlParts.Add("COMMIT;");
+
+            var sql = string.Join("\n", sqlParts);
 
             await db.Database.ExecuteSqlRawAsync(sql);
         }
 
         public static async Task SeedRolesAsync(AppDbContext db)
         {
-            // SuperAdmin already bootstrapped; only add if we still have <2 roles.
             if (await db.Roles.CountAsync() > 1) return;
 
             var now = DateTime.UtcNow;

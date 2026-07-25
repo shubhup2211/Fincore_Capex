@@ -65,5 +65,7 @@ namespace Fincore.Domain.Models
         public List<WorkOrder> WorkOrders { get; set; }
         public List<APInvoice> APInvoices { get; set; }
         public List<Payment> Payments { get; set; }
+
+        public List<PurchaseOrder> PurchaseOrders { get; set; }
     }
 }
