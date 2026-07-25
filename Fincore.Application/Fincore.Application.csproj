@@ -17,6 +17,7 @@
     <Folder Include="Interfaces\ICapex\" />
     <Folder Include="Interfaces\IMasterTable\" />
     <Folder Include="DTO\Opex\" />
+    <Folder Include="DTO\Payment\RevenueEntry\Responses\" />
     <Folder Include="Interfaces\ICapex\" />
     <Folder Include="Interfaces\IBudget\" />
     <Folder Include="Interfaces\IOpex\" />

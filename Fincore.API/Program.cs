@@ -115,6 +115,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         builder.Configuration.GetConnectionString("dbconn"),
         b => b.MigrationsAssembly("Fincore.Infrastructure")));
 
+builder.Services.AddAutoMapper(typeof(MapperConfigPayment));
+builder.Services.AddAutoMapper(typeof(APInvoiceProfile));
+
+
+builder.Services.AddScoped<IRevenueService, RevenueService>();
+builder.Services.AddScoped<IAPInvoiceService, APInvoiceService>();
+//builder.Services.AddScoped<IARInvoiceService, ARInvoiceService>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
 // ---------------------- AutoMapper ----------------------
