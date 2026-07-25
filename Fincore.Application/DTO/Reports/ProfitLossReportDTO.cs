@@ -8,13 +8,17 @@ namespace Fincore.Application.DTO.Reports
 {
      public class ProfitLossReportDTO
     {
-        
-            public decimal TotalRevenue { get; set; }
+        public string CompanyName { get; set; }
 
-            public decimal TotalExpense { get; set; }
+        public string DepartmentName { get; set; }
 
-            public decimal NetProfitOrLoss { get; set; }
-        
-        
+        public decimal TotalRevenue { get; set; }
+
+        public decimal TotalExpense { get; set; }
+
+        public decimal Profit { get; set; }
+
+        public decimal Loss { get; set; }
+
     }
 }

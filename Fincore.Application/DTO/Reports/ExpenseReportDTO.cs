@@ -25,5 +25,7 @@ namespace Fincore.Application.DTO.Reports
         public string OpexTitle { get; set; }
 
         public string ClaimedBy { get; set; }
+
+        public string Department { get; set; }
     }
 }

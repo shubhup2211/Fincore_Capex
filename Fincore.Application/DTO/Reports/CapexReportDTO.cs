@@ -18,6 +18,12 @@ namespace Fincore.Application.DTO.Reports
 
         public string DepartmentName { get; set; }
 
+        public string RequestedBy { get; set; }
+
+        public decimal BudgetAllocated { get; set; }
+
+        public decimal? BudgetUtilized { get; set; }
+
         public string ApprovalStatus { get; set; }
 
         public DateTime? ApprovedAt { get; set; }

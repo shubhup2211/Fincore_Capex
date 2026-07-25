@@ -1,7 +1,9 @@
 ﻿using Fincore.Application.Interfaces;
 using Fincore.Infrastructure.CommonHelper;
+using Fincore.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+
 
 namespace Fincore.API.Controllers
 {
@@ -17,98 +19,75 @@ namespace Fincore.API.Controllers
         }
 
         [HttpGet("revenue")]
-        public async Task<IActionResult> GetRevenue()
+        public async Task<IActionResult> GetRevenue(int page = 1, int pageSize = 10)
         {
-            var result = await service.GetRevenueAsync();
+            var response = await service.GetRevenueAsync(page, pageSize);
 
-            return Ok(ApiResponseHelper.SuccessRes(result, "Revenue report fetched successfully.", result.Count
-             ));
-
+            return Ok(response);
         }
 
         [HttpGet("expense")]
-        public async Task<IActionResult> GetExpense()
+        public async Task<IActionResult> GetExpense(int page = 1, int pageSize = 10)
         {
-            var result = await service.GetExpenseAsync();
+            var response = await service.GetExpenseAsync(page, pageSize);
 
-            return Ok(ApiResponseHelper.SuccessRes(
-                result,
-                "Expense report fetched successfully.",
-                result.Count
-            ));
+            return Ok(response);
         }
 
         [HttpGet("vendor-spend")]
-        public async Task<IActionResult> GetVendorSpend()
+        public async Task<IActionResult> GetVendorSpend(int page = 1, int pageSize = 10)
         {
-            var result = await service.GetVendorSpendAsync();
+            var response = await service.GetVendorSpendAsync(page, pageSize);
 
-            return Ok(ApiResponseHelper.SuccessRes(
-                result,
-                "Vendor spend report fetched successfully.",
-                result.Count
-            ));
+            return Ok(response);
         }
 
-
         [HttpGet("capex")]
-        public async Task<IActionResult> GetCapex()
+        public async Task<IActionResult> GetCapex(int page = 1, int pageSize = 10)
         {
-            var result = await service.GetCapexAsync();
+            var response = await service.GetCapexAsync(page, pageSize);
 
-            return Ok(ApiResponseHelper.SuccessRes(
-                result,
-                "CAPEX report fetched successfully.",
-                result.Count
-            ));
+            return Ok(response);
         }
 
         [HttpGet("opex")]
-        public async Task<IActionResult> GetOpex()
+        public async Task<IActionResult> GetOpex(int page = 1, int pageSize = 10)
         {
-            var result = await service.GetOpexAsync();
+            var response = await service.GetOpexAsync(page, pageSize);
 
-            return Ok(ApiResponseHelper.SuccessRes(
-                result,
-                "OPEX report fetched successfully.",
-                result.Count
-            ));
+            return Ok(response);
         }
 
         [HttpGet("budget-variance")]
-        public async Task<IActionResult> GetBudgetVariance()
+        public async Task<IActionResult> GetBudgetVariance(int page = 1, int pageSize = 10)
         {
-            var result = await service.GetBudgetVarianceAsync();
+            var response = await service.GetBudgetVarianceAsync(page, pageSize);
 
-            return Ok(ApiResponseHelper.SuccessRes(
-                result,
-                "Budget variance report fetched successfully.",
-                result.Count
-            ));
+            return Ok(response);
         }
 
         [HttpGet("profit-loss")]
-        public async Task<IActionResult> GetProfitLoss()
+        public async Task<IActionResult> GetProfitLoss(int? companyId,int? departmentId,DateTime? fromDate,DateTime? toDate)
         {
-            var result = await service.GetProfitLossAsync();
+            var response = await service.GetProfitLossAsync(companyId,departmentId,fromDate, toDate);
 
-            return Ok(ApiResponseHelper.SuccessRes(
-                result,
-                "Profit & Loss report fetched successfully.",
-                1
-            ));
+            return Ok(response);
         }
 
         [HttpGet("cash-flow")]
-        public async Task<IActionResult> GetCashFlow()
+        public async Task<IActionResult> GetCashFlow(int? companyId, int? departmentId,DateTime? fromDate, DateTime? toDate)
         {
-            var result = await service.GetCashFlowAsync();
+            var response = await service.GetCashFlowAsync(companyId,departmentId,fromDate, toDate);
 
-            return Ok(ApiResponseHelper.SuccessRes(
-                result,
-                "Cash flow report fetched successfully.",
-                1
-            ));
+            return Ok(response);
+        }
+
+        [HttpGet("balance-sheet")]
+        public async Task<IActionResult> GetBalanceSheet(int page = 1,int pageSize = 10)
+        {
+            var response = await service.GetBalanceSheetAsync(page, pageSize);
+
+            return Ok(response);
         }
     }
 }

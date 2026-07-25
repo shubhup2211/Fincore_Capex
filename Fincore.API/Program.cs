@@ -39,9 +39,10 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.AddMemoryCache();
 
-builder.Services.AddAutoMapper(typeof(ReportProfile));
+builder.Services.AddAutoMapper(typeof(ReportProfile).Assembly);
 
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IGeneralLedgerService, GeneralLedgerService>();
 
 var app = builder.Build();
 

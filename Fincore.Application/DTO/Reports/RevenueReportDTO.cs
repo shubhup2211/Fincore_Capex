@@ -16,6 +16,8 @@ namespace Fincore.Application.DTO.Reports
 
         public string DepartmentName { get; set; }
 
+        public string DepartmentCode { get; set; }
+
         public string AccountCode { get; set; }
 
         public string AccountName { get; set; }

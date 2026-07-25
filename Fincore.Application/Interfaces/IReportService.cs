@@ -1,4 +1,5 @@
-﻿using Fincore.Application.DTO.Reports;
+﻿using Fincore.Application.DTO;
+using Fincore.Application.DTO.Reports;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,21 +10,23 @@ namespace Fincore.Application.Interfaces
 {
     public interface IReportService
     {
-        Task<List<RevenueReportDTO>> GetRevenueAsync();
+        Task<ApiResponse<List<RevenueReportDTO>>> GetRevenueAsync(int page, int pageSize);
 
-        Task<List<ExpenseReportDTO>> GetExpenseAsync();
+        Task<ApiResponse<List<ExpenseReportDTO>>> GetExpenseAsync(int page, int pageSize);
 
-        Task<List<VendorSpendDTO>> GetVendorSpendAsync();
+        Task<ApiResponse<List<VendorSpendDTO>>> GetVendorSpendAsync(int page, int pageSize);
 
-        Task<List<CapexReportDTO>> GetCapexAsync();
+        Task<ApiResponse<List<CapexReportDTO>>> GetCapexAsync(int page, int pageSize);
 
-        Task<List<OpexReportDTO>> GetOpexAsync();
+        Task<ApiResponse<List<OpexReportDTO>>> GetOpexAsync(int page, int pageSize);
 
-        Task<List<BudgetVarianceReportDTO>> GetBudgetVarianceAsync();
+        Task<ApiResponse<List<BudgetVarianceReportDTO>>> GetBudgetVarianceAsync(int page, int pageSize);
 
-        Task<ProfitLossReportDTO> GetProfitLossAsync();
+        Task<ApiResponse<ProfitLossReportDTO>> GetProfitLossAsync(int? companyId, int? departmentId,DateTime? fromDate,DateTime? toDate);
 
-        Task<CashFlowReportDTO> GetCashFlowAsync();
+        Task<ApiResponse<CashFlowReportDTO>> GetCashFlowAsync(int? companyId, int? departmentId,DateTime? fromDate, DateTime? toDate);
+
+        Task<ApiResponse<List<BalanceSheetReportDTO>>> GetBalanceSheetAsync(int page,int pageSize);
     }
 
 }
