@@ -64,7 +64,7 @@ namespace Fincore.Domain.Models
         // Navigation Properties
         public List<PurchaseOrderItem> PurchaseOrderItems { get; set; }
         public List<GRN> GRNs { get; set; }
-        public List<Asset> Assets { get; set; }
+        public List<Asset> Assets { get; set; } 
         public List<APInvoice> APInvoices { get; set; }
     }
 }

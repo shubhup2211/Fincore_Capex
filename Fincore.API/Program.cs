@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using QuestPDF.Infrastructure;
 using Fincore.Application.Interfaces;
 using Fincore.Infrastructure.Services;
 using Fincore.Application;
@@ -23,8 +24,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Fincore.Infrastructure;
 
-var builder = WebApplication.CreateBuilder(args);
 
+
+var builder = WebApplication.CreateBuilder(args);
+QuestPDF.Settings.License = LicenseType.Community;
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -117,6 +120,17 @@ builder.Services.AddRateLimiter(options =>
 });
 
 builder.Services.AddMemoryCache();
+builder.Services.AddAutoMapper(
+    typeof(MapperConfigPurchaseOrder),
+    typeof(MapperConfigPurchaseOrderItem),
+    typeof(MapperConfigAsset),
+    typeof(MapperConfigGRN)
+);
+
+builder.Services.AddScoped<IPurchaseOrderService, PurchaseOrderService>();
+builder.Services.AddScoped<IPurchaseOrderItemService, PurchaseOrderItemService>();
+builder.Services.AddScoped<IAssetService, AssetService>();
+builder.Services.AddScoped<IGRNService, GRNService>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
