@@ -1,4 +1,5 @@
-﻿using Fincore.Application.Interfaces;
+﻿using Fincore.Application.CommonHelper;
+using Fincore.Application.Interfaces;
 using Fincore.Domain.Models;
 using Fincore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +15,24 @@ namespace Fincore.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Country>> GetAllAsync()
+        public async Task<PagedResponse<Country>> GetAllAsync(int pageNumber, int pageSize)
         {
-            return await _context.Countries.ToListAsync();
+            var totalRecords = await _context.Countries.CountAsync();
+
+            var countries = await _context.Countries
+                .OrderBy(x => x.CountryId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResponse<Country>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalRecords = totalRecords,
+                TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize),
+                Data = countries
+            };
         }
 
         public async Task<Country?> GetByIdAsync(int id)
@@ -54,7 +70,6 @@ namespace Fincore.Infrastructure.Services
             if (country == null)
                 return false;
 
-            // Check if any Company is using this Country
             bool companyExists = await _context.Companies
                 .AnyAsync(c => c.CountryId == id);
 
@@ -62,15 +77,15 @@ namespace Fincore.Infrastructure.Services
                 throw new InvalidOperationException(
                     "Cannot delete this country because it is assigned to one or more companies.");
 
-            // Check if any State is using this Country
             bool stateExists = await _context.States
                 .AnyAsync(s => s.CountryId == id);
 
             if (stateExists)
-                throw new InvalidOperationException(
-                    "Cannot delete this country because it has states.");
+              throw new InvalidOperationException(
+                   "Cannot delete this country because it has states.");
 
             _context.Countries.Remove(country);
+
             await _context.SaveChangesAsync();
 
             return true;

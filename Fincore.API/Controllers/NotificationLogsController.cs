@@ -1,11 +1,13 @@
-﻿using Fincore.Application.Interfaces;
-using Fincore.Domain.Models;
+﻿using Fincore.Application.DTOs;
+using Fincore.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Fincore.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    [EnableRateLimiting("FixedPolicy")]
     public class NotificationLogsController : ControllerBase
     {
         private readonly INotificationLogService _service;
@@ -15,13 +17,12 @@ namespace Fincore.API.Controllers
             _service = service;
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(int pageNumber = 1, int pageSize = 10)
         {
-            return Ok(await _service.GetAllAsync());
+            var result = await _service.GetAllAsync(pageNumber, pageSize);
+            return Ok(result);
         }
-
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(long id)
@@ -29,47 +30,41 @@ namespace Fincore.API.Controllers
             var result = await _service.GetByIdAsync(id);
 
             if (result == null)
-                return NotFound();
+                return NotFound("Notification Log not found.");
 
             return Ok(result);
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> Create(NotificationLog log)
+        public async Task<IActionResult> Create(NotificationLogRequestDto dto)
         {
-            return Ok(await _service.CreateAsync(log));
-        }
+            var result = await _service.CreateAsync(dto);
 
+            return CreatedAtAction(nameof(GetById),
+                new { id = result.NotificationLogId },
+                result);
+        }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(long id, NotificationLog log)
+        public async Task<IActionResult> Update(long id, NotificationLogRequestDto dto)
         {
-            var result = await _service.UpdateAsync(id, log);
+            var result = await _service.UpdateAsync(id, dto);
 
             if (result == null)
-                return NotFound();
+                return NotFound("Notification Log not found.");
 
-            return Ok("Notification log updated successfully.");
+            return Ok(result);
         }
-
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(long id)
         {
-            try
-            {
-                var result = await _service.DeleteAsync(id);
+            var result = await _service.DeleteAsync(id);
 
-                if (!result)
-                    return NotFound("Notification log not found.");
+            if (!result)
+                return NotFound("Notification Log not found.");
 
-                return Ok("Notification log deleted successfully.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.InnerException?.Message ?? ex.Message);
-            }
+            return Ok("Notification Log deleted successfully.");
         }
     }
 }

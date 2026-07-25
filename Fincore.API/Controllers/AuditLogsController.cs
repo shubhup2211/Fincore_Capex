@@ -1,93 +1,157 @@
-﻿using Fincore.Application.Interfaces;
-using Fincore.Domain.Models;
+﻿using Fincore.Application.DTOs;
+using Fincore.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fincore.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AuditLogsController : ControllerBase
     {
+
         private readonly IAuditLogService _auditService;
 
-        public AuditLogsController(IAuditLogService auditService)
+
+        public AuditLogsController(
+            IAuditLogService auditService)
         {
             _auditService = auditService;
         }
 
 
-        // GET: api/AuditLogs
+
+        // GET ALL
+        // Example:
+        // api/AuditLogs?pageNumber=1&pageSize=10
+
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            int pageNumber = 1,
+            int pageSize = 10)
         {
-            var result = await _auditService.GetAllAsync();
+
+            var result =
+                await _auditService
+                .GetAllAsync(pageNumber, pageSize);
+
 
             return Ok(result);
+
         }
 
 
-        // GET: api/AuditLogs/1
+
+
+
+        // GET BY ID
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(long id)
         {
-            var result = await _auditService.GetByIdAsync(id);
+
+            var result =
+                await _auditService
+                .GetByIdAsync(id);
+
+
 
             if (result == null)
-                return NotFound("Audit log not found.");
+                return NotFound(
+                    "Audit log not found."
+                );
+
 
             return Ok(result);
+
         }
 
+
+
+
+
+        // CREATE
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] AuditLog auditLog)
+        public async Task<IActionResult> Create(
+            AuditLogRequestDto dto)
         {
-            ModelState.Remove(nameof(AuditLog.AuditByUser));
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+                var result =
+                await _auditService
+                .CreateAsync(dto);
 
-            var result = await _auditService.CreateAsync(auditLog);
+            return CreatedAtAction(
+                nameof(GetById),
+                new
+                {
+                    id = result.AuditLogId
+                },
+                result
+            );
 
-            return Ok(result);
         }
 
 
-        // PUT: api/AuditLogs/1
+
+
+
+        // UPDATE
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(long id, [FromBody] AuditLog auditLog)
+
+        public async Task<IActionResult> Update(
+            long id,
+            AuditLogRequestDto dto)
         {
-            ModelState.Remove(nameof(AuditLog.AuditByUser));
 
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
 
-            var result = await _auditService.UpdateAsync(id, auditLog);
+            var result =
+                await _auditService
+                .UpdateAsync(id, dto);
+
+
 
             if (result == null)
-                return NotFound("Audit log not found.");
+                return NotFound(
+                    "Audit log not found."
+                );
 
-            return Ok("Audit log updated successfully.");
+
+            return Ok(result);
+
         }
 
 
-        // DELETE: api/AuditLogs/1
+
+
+
+        // DELETE
+
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(long id)
+
+        public async Task<IActionResult> Delete(
+            long id)
         {
-            try
-            {
-                var result = await _auditService.DeleteAsync(id);
 
-                if (!result)
-                    return NotFound("Audit log not found.");
 
-                return Ok("Audit log deleted successfully.");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.InnerException?.Message ?? ex.Message);
-            }
+            var result =
+                await _auditService
+                .DeleteAsync(id);
+
+
+
+            if (!result)
+                return NotFound(
+                    "Audit log not found."
+                );
+
+
+
+            return Ok(
+                "Audit log deleted successfully."
+            );
+
         }
+
     }
 }

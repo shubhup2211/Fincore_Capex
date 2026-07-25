@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Fincore.Domain.Models;
+﻿using Fincore.Application.CommonHelper;
+using Fincore.Application.DTOs;
 
 namespace Fincore.Application.Interfaces
 {
     public interface INotificationLogService
     {
-        Task<IEnumerable<NotificationLog>> GetAllAsync();
-        Task<NotificationLog?> GetByIdAsync(long id);
-        Task<NotificationLog> CreateAsync(NotificationLog log);
-        Task<NotificationLog?> UpdateAsync(long id, NotificationLog log);
+        Task<PagedResponse<NotificationLogResponseDto>> GetAllAsync(int pageNumber, int pageSize);
+
+        Task<NotificationLogResponseDto?> GetByIdAsync(long id);
+
+        Task<NotificationLogResponseDto> CreateAsync(NotificationLogRequestDto dto);
+
+        Task<NotificationLogResponseDto?> UpdateAsync(long id, NotificationLogRequestDto dto);
+
         Task<bool> DeleteAsync(long id);
     }
 }

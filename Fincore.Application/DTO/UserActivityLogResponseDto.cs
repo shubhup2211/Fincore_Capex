@@ -1,10 +1,11 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace Fincore.Application.DTOs
 {
-    public class UserActivityLogRequestDto
+    public class UserActivityLogResponseDto
     {
+        public long UserActivityLogId { get; set; }
+
         public int UserId { get; set; }
 
         public string ActivityType { get; set; } = string.Empty;
@@ -13,5 +14,4 @@ namespace Fincore.Application.DTOs
 
         public DateTime ActivityDate { get; set; }
     }
-
 }

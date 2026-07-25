@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Fincore.Application.DTOs
 {
-    public class CurrencyRequestDto
+    public class CurrencyResponseDto
     {
+        public int CurrencyId { get; set; }
+
         public string CurrencyName { get; set; } = string.Empty;
 
         public string Symbol { get; set; } = string.Empty;

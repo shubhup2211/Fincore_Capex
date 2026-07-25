@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Fincore.Domain.Models;
+﻿using Fincore.Application.CommonHelper;
+using Fincore.Application.DTOs;
 
 namespace Fincore.Application.Interfaces
 {
     public interface IApprovalLogService
     {
-        Task<IEnumerable<ApprovalLog>> GetAllAsync();
+        Task<PagedResponse<ApprovalLogResponseDto>> GetAllAsync(int pageNumber, int pageSize);
 
-        Task<ApprovalLog?> GetByIdAsync(int id);
+        Task<ApprovalLogResponseDto?> GetByIdAsync(int id);
 
-        Task<ApprovalLog> CreateAsync(ApprovalLog log);
+        Task<ApprovalLogResponseDto> CreateAsync(ApprovalLogRequestDto dto);
 
-        Task<ApprovalLog?> UpdateAsync(int id, ApprovalLog log);
+        Task<ApprovalLogResponseDto?> UpdateAsync(int id, ApprovalLogRequestDto dto);
 
         Task<bool> DeleteAsync(int id);
     }

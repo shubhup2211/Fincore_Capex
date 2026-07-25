@@ -1,4 +1,5 @@
-﻿using Fincore.Application.Interfaces;
+﻿using Fincore.Application.CommonHelper;
+using Fincore.Application.Interfaces;
 using Fincore.Domain.Models;
 using Fincore.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +15,26 @@ namespace Fincore.Infrastructure.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<City>> GetAllAsync()
+        // Pagination
+        public async Task<PagedResponse<City>> GetAllAsync(int pageNumber, int pageSize)
         {
-            return await _context.Cities
+            var totalRecords = await _context.Cities.CountAsync();
+
+            var cities = await _context.Cities
                 .Include(c => c.State)
+                .OrderBy(c => c.CityId)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
+
+            return new PagedResponse<City>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalRecords = totalRecords,
+                TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize),
+                Data = cities
+            };
         }
 
         public async Task<City?> GetByIdAsync(int id)
@@ -32,6 +48,7 @@ namespace Fincore.Infrastructure.Services
         {
             _context.Cities.Add(city);
             await _context.SaveChangesAsync();
+
             return city;
         }
 
@@ -58,6 +75,7 @@ namespace Fincore.Infrastructure.Services
                 return false;
 
             _context.Cities.Remove(city);
+
             await _context.SaveChangesAsync();
 
             return true;

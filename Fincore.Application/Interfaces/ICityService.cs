@@ -1,13 +1,18 @@
-﻿using Fincore.Domain.Models;
+﻿using Fincore.Application.CommonHelper;
+using Fincore.Domain.Models;
 
 namespace Fincore.Application.Interfaces
 {
     public interface ICityService
     {
-        Task<IEnumerable<City>> GetAllAsync();
+        Task<PagedResponse<City>> GetAllAsync(int pageNumber, int pageSize);
+
         Task<City?> GetByIdAsync(int id);
+
         Task<City> CreateAsync(City city);
+
         Task<City?> UpdateAsync(int id, City city);
+
         Task<bool> DeleteAsync(int id);
     }
 }

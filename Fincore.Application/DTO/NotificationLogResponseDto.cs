@@ -1,19 +1,17 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace Fincore.Application.DTOs
 {
-    public class NotificationLogRequestDto
+    public class NotificationLogResponseDto
     {
-        [Required]
+        public long NotificationLogId { get; set; }
+
         public int UserId { get; set; }
 
-        [Required]
         public string Title { get; set; } = string.Empty;
 
-        [Required]
         public string Message { get; set; } = string.Empty;
 
-        public DateTime SentAt { get; set; } = DateTime.UtcNow;
+        public DateTime SentAt { get; set; }
     }
 }

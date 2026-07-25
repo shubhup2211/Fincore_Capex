@@ -1,11 +1,13 @@
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Fincore.Application.Interfaces;
+using Fincore.Application.Mapping;
 using Fincore.Infrastructure.Data;
 using Fincore.Infrastructure.Seed;
 using Fincore.Infrastructure.Services;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,7 @@ builder.Services.AddScoped<IAuditLogService, AuditLogService>();
 builder.Services.AddScoped<IUserActivityLogService, UserActivityLogService>();
 builder.Services.AddScoped<INotificationLogService, NotificationLogService>();
 builder.Services.AddScoped<IApprovalLogService, ApprovalLogService>();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("dbconn"),

@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Fincore.Application.DTOs
 {
-    public class CountryRequestDto
+    public class CountryResponseDto
     {
+        public int CountryId { get; set; }
+
         public int CountryCode { get; set; }
 
         public string CountryName { get; set; } = string.Empty;

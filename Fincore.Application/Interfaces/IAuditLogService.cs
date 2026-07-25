@@ -1,23 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Fincore.Domain.Models;
+﻿using Fincore.Application.CommonHelper;
+using Fincore.Application.DTOs;
 
 namespace Fincore.Application.Interfaces
 {
     public interface IAuditLogService
     {
-        Task<IEnumerable<AuditLog>> GetAllAsync();
 
-        Task<AuditLog?> GetByIdAsync(long id);
+        Task<PagedResponse<AuditLogResponseDto>>
+        GetAllAsync(int pageNumber, int pageSize);
 
-        Task<AuditLog> CreateAsync(AuditLog auditLog);
 
-        Task<AuditLog?> UpdateAsync(long id, AuditLog auditLog);
+        Task<AuditLogResponseDto?>
+        GetByIdAsync(long id);
+
+
+        Task<AuditLogResponseDto>
+        CreateAsync(AuditLogRequestDto dto);
+
+
+        Task<AuditLogResponseDto?>
+        UpdateAsync(long id, AuditLogRequestDto dto);
+
 
         Task<bool> DeleteAsync(long id);
+
     }
 }

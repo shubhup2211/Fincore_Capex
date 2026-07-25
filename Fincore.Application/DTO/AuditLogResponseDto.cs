@@ -1,7 +1,9 @@
 ﻿namespace Fincore.Application.DTOs
 {
-    public class AuditLogRequestDto
+    public class AuditLogResponseDto
     {
+        public long AuditLogId { get; set; }
+
         public string EntityName { get; set; } = string.Empty;
 
         public long EntityId { get; set; }

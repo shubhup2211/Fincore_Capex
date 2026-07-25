@@ -1,74 +1,118 @@
-﻿using Fincore.Application.DTOs;
+﻿using AutoMapper;
+using Fincore.Application.CommonHelper;
+using Fincore.Application.DTOs;
 using Fincore.Application.Interfaces;
 using Fincore.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace Fincore.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CountryController : ControllerBase
+    [EnableRateLimiting("FixedPolicy")]
+    public partial class CountryController : ControllerBase
     {
         private readonly ICountryService _countryService;
+        private readonly IMapper _mapper;
+        private readonly IMemoryCache _cache;
 
-        public CountryController(ICountryService countryService)
+        public CountryController(
+            ICountryService countryService,
+            IMapper mapper,
+            IMemoryCache cache)
         {
             _countryService = countryService;
+            _mapper = mapper;
+            _cache = cache;
         }
 
-        // GET: api/Country
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            int pageNumber = 1,
+            int pageSize = 10)
         {
-            var countries = await _countryService.GetAllAsync();
-            return Ok(countries);
+            string cacheKey = $"Country_{pageNumber}_{pageSize}";
+
+            if (!_cache.TryGetValue(cacheKey, out PagedResponse<CountryResponseDto>? response))
+            {
+                var countries = await _countryService.GetAllAsync(pageNumber, pageSize);
+
+                response = new PagedResponse<CountryResponseDto>
+                {
+                    PageNumber = countries.PageNumber,
+                    PageSize = countries.PageSize,
+                    TotalRecords = countries.TotalRecords,
+                    TotalPages = countries.TotalPages,
+                    Data = _mapper.Map<List<CountryResponseDto>>(countries.Data)
+                };
+
+                _cache.Set(
+                    cacheKey,
+                    response,
+                    TimeSpan.FromMinutes(5));
+            }
+
+            return Ok(response);
         }
 
-        // GET: api/Country/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var country = await _countryService.GetByIdAsync(id);
+            string cacheKey = $"Country_{id}";
 
-            if (country == null)
-                return NotFound("Country not found.");
+            if (!_cache.TryGetValue(cacheKey, out CountryResponseDto? response))
+            {
+                var country = await _countryService.GetByIdAsync(id);
 
-            return Ok(country);
+                if (country == null)
+                    return NotFound("Country not found.");
+
+                response = _mapper.Map<CountryResponseDto>(country);
+
+                _cache.Set(
+                    cacheKey,
+                    response,
+                    TimeSpan.FromMinutes(5));
+            }
+
+            return Ok(response);
         }
-
-        // POST: api/Country
         [HttpPost]
         public async Task<IActionResult> Create(CountryRequestDto dto)
         {
-            var country = new Country
-            {
-                CountryCode = dto.CountryCode,
-                CountryName = dto.CountryName,
-                CurrencyId = dto.CurrencyId
-            };
+            var country = _mapper.Map<Country>(dto);
 
-            var result = await _countryService.CreateAsync(country);
+            var createdCountry = await _countryService.CreateAsync(country);
 
-            return CreatedAtAction(nameof(GetById), new { id = result.CountryId }, result);
+            // Clear paginated cache
+            _cache.Remove("Country_1_10");
+
+            var response = _mapper.Map<CountryResponseDto>(createdCountry);
+
+            return CreatedAtAction(nameof(GetById),
+                new { id = response.CountryId },
+                response);
         }
 
-        // PUT: api/Country/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, CountryRequestDto dto)
         {
-            var country = new Country
-            {
-                CountryCode = dto.CountryCode,
-                CountryName = dto.CountryName,
-                CurrencyId = dto.CurrencyId
-            };
+            var country = _mapper.Map<Country>(dto);
 
-            var result = await _countryService.UpdateAsync(id, country);
+            var updatedCountry = await _countryService.UpdateAsync(id, country);
 
-            if (result == null)
-                return NotFound();
+            if (updatedCountry == null)
+                return NotFound("Country not found.");
 
-            return Ok(result);
+            // Clear cache
+            _cache.Remove($"Country_{id}");
+            _cache.Remove("Country_1_10");
+
+            var response = _mapper.Map<CountryResponseDto>(updatedCountry);
+
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]
@@ -79,7 +123,11 @@ namespace Fincore.API.Controllers
                 var result = await _countryService.DeleteAsync(id);
 
                 if (!result)
-                    return NotFound();
+                    return NotFound("Country not found.");
+
+                // Clear cache
+                _cache.Remove($"Country_{id}");
+                _cache.Remove("Country_1_10");
 
                 return Ok("Country deleted successfully.");
             }
@@ -88,8 +136,5 @@ namespace Fincore.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
-
-
     }
 }
