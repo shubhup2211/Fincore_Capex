@@ -23,6 +23,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Fincore.Infrastructure;
+using Fincore.Application.AutoMapper.Capex;
+using Fincore.Application.Interfaces.ICapex;
+using Fincore.Infrastructure.Services.Capex;
 
 
 
@@ -121,7 +124,7 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.AddMemoryCache();
 builder.Services.AddAutoMapper(
-    typeof(MapperConfigPurchaseOrder),
+    typeof(MapperConfigPurchaseOrderItem),
     typeof(MapperConfigPurchaseOrderItem),
     typeof(MapperConfigAsset),
     typeof(MapperConfigGRN)
