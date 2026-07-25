@@ -150,6 +150,18 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
+builder.Services.AddScoped<IDocumentService, DocumentService>();
+builder.Services.AddScoped<IDocumentTypeService,DocumentTypeService>();
+builder.Services.AddScoped<IExecutiveService, ExecutiveService>();
+builder.Services.AddScoped<IFinanceService, FinanceService>();
+builder.Services.AddScoped<IProcurementService, ProcurementService>();
+builder.Services.AddScoped<IBudgetService, BudgetService>();
+builder.Services.AddScoped<IMasterType, MasterTypeService>();
+builder.Services.AddAutoMapper(typeof(DocumentMappingProfile));
+
+builder.Services.AddMemoryCache();
+
 // ---------------------- Rate Limiting ----------------------
 builder.Services.AddRateLimiter(options =>
 {
