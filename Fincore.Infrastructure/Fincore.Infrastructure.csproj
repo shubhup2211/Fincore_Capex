@@ -9,10 +9,8 @@
   <ItemGroup>
     <Folder Include="Services\Capex\" />
     <Folder Include="Services\MasterTable\" />
-    <Folder Include="Services\Budget\" />
     <Folder Include="Services\Logs\" />
     <Folder Include="Services\Payment\" />
-    <Folder Include="Services\Opex\" />
   </ItemGroup>
 
   <ItemGroup>

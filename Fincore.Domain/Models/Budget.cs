@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Fincore.Domain.Models
 {
@@ -24,6 +21,11 @@ namespace Fincore.Domain.Models
         [Required]
         [StringLength(20)]
         public string FinancialYear { get; set; }
+
+        //[Required]
+        //[ForeignKey("BudgetCategory")]
+        //public int BudgetCategoryId { get; set; }
+        //public BudgetCategory BudgetCategory { get; set; }
 
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
@@ -48,7 +50,7 @@ namespace Fincore.Domain.Models
         public int ModifiedBy { get; set; }
         public User ModifiedByUser { get; set; }
 
-        // Navigation Properties
+        // Navigation Property
         public List<BudgetLine> BudgetLines { get; set; }
     }
 }
