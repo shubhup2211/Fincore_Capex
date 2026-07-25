@@ -51,6 +51,10 @@ using Fincore.Infrastructure.Services.BudgetLine;
 using Fincore.Application.Mapping;
 using Fincore.Application.Interfaces.Dashboard;
 using Fincore.Infrastructure.Services.Dashboard;
+using Fincore.Application.AutoMapper.Payment;
+using Fincore.Application.Mapper;
+using Fincore.Application.Interfaces.Payment;
+using Fincore.Infrastructure.Services.Payment;
 
 
 

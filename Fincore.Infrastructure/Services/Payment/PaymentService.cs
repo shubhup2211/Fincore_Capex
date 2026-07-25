@@ -41,7 +41,7 @@ namespace Fincore.Infrastructure.Services.PaymentModule
 
             string paymentNumber = $"PAY-{DateTime.Now.Year}-{nextId:D5}";
 
-            var payment = mapper.Map<Payment>(dto);
+            var payment = mapper.Map<Fincore.Domain.Models.Payment>(dto);
 
             payment.PaymentNumber = paymentNumber;
             payment.ApprovalStatus = "Pending";
