@@ -10,9 +10,9 @@ using Fincore.Domain.Models;
 
 namespace Fincore.Application.AutoMapper
 {
-    public class MappingProfile : Profile
+    public class DocumentMappingProfile : Profile
     {
-        public MappingProfile() 
+        public DocumentMappingProfile() 
         {
             CreateMap<Document, DocumentDto>();
             CreateMap<CreateDocumentDto, Document>();

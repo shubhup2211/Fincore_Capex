@@ -31,7 +31,7 @@ builder.Services.AddScoped<IFinanceService, FinanceService>();
 builder.Services.AddScoped<IProcurementService, ProcurementService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IMasterType, MasterTypeService>();
-builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(typeof(DocumentMappingProfile));
 
 builder.Services.AddMemoryCache();
 
