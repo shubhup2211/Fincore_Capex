@@ -26,8 +26,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             this.passwordHasher = passwordHasher;
         }
 
-
-        // GET ALL USERS
         public async Task<ApiResponse<List<UserDto>>> GetAllUsersAsync(
             int pageNumber,
             int pageSize)
@@ -74,8 +72,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // GET USER BY ID
         public async Task<ApiResponse<UserDto>> GetUserByIdAsync(int id)
         {
             try
@@ -107,14 +103,11 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // CREATE USER
         public async Task<ApiResponse<UserDto>> CreateUserAsync(
             CreateUserDto createUserDto)
         {
             try
             {
-                // Check Role
                 var roleExists = await db.Roles
                     .AnyAsync(x => x.RoleId == createUserDto.RoleId);
 
@@ -126,8 +119,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Role with ID {createUserDto.RoleId} does not exist.");
                 }
 
-
-                // Check duplicate Email
                 var emailExists = await db.Users
                     .AnyAsync(x => x.Email == createUserDto.Email);
 
@@ -139,8 +130,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"User with email {createUserDto.Email} already exists.");
                 }
 
-
-                // Check CreatedBy
                 var createdByExists = await db.Users
                     .AnyAsync(x => x.UserId == createUserDto.CreatedBy);
 
@@ -152,17 +141,14 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"User with ID {createUserDto.CreatedBy} does not exist.");
                 }
 
-
                 var user = mapper.Map<User>(createUserDto);
 
                 user.UserId = 0;
 
-                // Hash Password
                 user.PasswordHash = passwordHasher.HashPassword(
                     user,
                     createUserDto.Password);
 
-                // Auditing
                 user.CreatedAt = DateTime.UtcNow;
                 user.ModifiedAt = DateTime.UtcNow;
                 user.ModifiedBy = createUserDto.CreatedBy;
@@ -194,15 +180,12 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // UPDATE USER
         public async Task<ApiResponse<UserDto>> UpdateUserAsync(
             int id,
             UpdateUserDto updateUserDto)
         {
             try
             {
-                // Check User
                 var user = await db.Users
                     .FirstOrDefaultAsync(x => x.UserId == id);
 
@@ -214,8 +197,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"User with ID {id} does not exist.");
                 }
 
-
-                // Check Role
                 var roleExists = await db.Roles
                     .AnyAsync(x => x.RoleId == updateUserDto.RoleId);
 
@@ -227,8 +208,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Role with ID {updateUserDto.RoleId} does not exist.");
                 }
 
-
-                // Check duplicate Email
                 var emailExists = await db.Users
                     .AnyAsync(x =>
                         x.Email == updateUserDto.Email &&
@@ -242,8 +221,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"User with email {updateUserDto.Email} already exists.");
                 }
 
-
-                // Check ModifiedBy
                 var modifiedByExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId == updateUserDto.ModifiedBy);
@@ -264,7 +241,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 user.Phone = updateUserDto.Phone;
                 user.IsActive = updateUserDto.IsActive;
 
-                // Auditing
                 user.ModifiedBy = updateUserDto.ModifiedBy;
                 user.ModifiedAt = DateTime.UtcNow;
 
@@ -291,8 +267,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // DELETE USER
         public async Task<ApiResponse<bool>> DeleteUserAsync(int id)
         {
             try

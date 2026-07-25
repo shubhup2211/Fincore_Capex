@@ -20,7 +20,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             this.mapper = mapper;
         }
 
-
         public async Task<ApiResponse<IEnumerable<DepartmentDTO>>> GetAllDepartmentsAsync(
             int pageNumber,
             int pageSize)
@@ -209,8 +208,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        
         public async Task<ApiResponse<DepartmentDTO>> UpdateDepartmentAsync(
             int id,
             DepartmentDTO departmentDTO)

@@ -22,8 +22,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             this.mapper = mapper;
         }
 
-
-        // GET ALL PERMISSIONS
         public async Task<ApiResponse<List<PermissionDto>>>
             GetAllPermissionsAsync(
                 int pageNumber,
@@ -73,8 +71,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // GET PERMISSION BY ID
         public async Task<ApiResponse<PermissionDto>>
             GetPermissionByIdAsync(int id)
         {
@@ -110,15 +106,12 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // CREATE PERMISSION
         public async Task<ApiResponse<PermissionDto>>
             CreatePermissionAsync(
                 CreatePermissionDto createPermissionDto)
         {
             try
             {
-                // Check Role
                 var roleExists = await db.Roles
                     .AnyAsync(x =>
                         x.RoleId == createPermissionDto.RoleId);
@@ -131,8 +124,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Role with ID {createPermissionDto.RoleId} does not exist.");
                 }
 
-
-                // Check MasterType only when provided
                 if (createPermissionDto.MasterTypeId.HasValue)
                 {
                     var masterTypeExists = await db.MasterTypes
@@ -149,8 +140,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                     }
                 }
 
-
-                // Check CreatedBy
                 var createdByExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId == createPermissionDto.CreatedBy);
@@ -169,7 +158,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
 
                 permission.PermissionId = 0;
 
-                // Auditing
                 permission.CreatedAt = DateTime.UtcNow;
                 permission.ModifiedAt = DateTime.UtcNow;
                 permission.ModifiedBy =
@@ -202,8 +190,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // UPDATE PERMISSION
         public async Task<ApiResponse<PermissionDto>>
             UpdatePermissionAsync(
                 int id,
@@ -211,7 +197,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
         {
             try
             {
-                // Check Permission
                 var permission = await db.Permissions
                     .FirstOrDefaultAsync(
                         x => x.PermissionId == id);
@@ -224,8 +209,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Permission with ID {id} does not exist.");
                 }
 
-
-                // Check Role
                 var roleExists = await db.Roles
                     .AnyAsync(x =>
                         x.RoleId == updatePermissionDto.RoleId);
@@ -238,8 +221,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Role with ID {updatePermissionDto.RoleId} does not exist.");
                 }
 
-
-                // Check MasterType only when provided
                 if (updatePermissionDto.MasterTypeId.HasValue)
                 {
                     var masterTypeExists = await db.MasterTypes
@@ -256,8 +237,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                     }
                 }
 
-
-                // Check ModifiedBy
                 var modifiedByExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId ==
@@ -284,7 +263,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 permission.IsActive =
                     updatePermissionDto.IsActive;
 
-                // Auditing
                 permission.ModifiedBy =
                     updatePermissionDto.ModifiedBy;
 
@@ -317,8 +295,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // DELETE PERMISSION
         public async Task<ApiResponse<bool>>
             DeletePermissionAsync(int id)
         {

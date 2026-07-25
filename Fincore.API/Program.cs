@@ -61,14 +61,11 @@ builder.Services.AddScoped<IVendorCategoryService, VendorCategoryService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-//await DatabaseSeeder.SeedAsync(app.Services);
 
 app.UseHttpsRedirection();
 

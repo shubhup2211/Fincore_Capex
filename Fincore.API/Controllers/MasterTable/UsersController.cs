@@ -17,8 +17,6 @@ namespace Fincore.API.Controllers.MasterTable
             this.userService = userService;
         }
 
-
-        // GET: api/v1/users?pageNumber=1&pageSize=10
         [HttpGet]
         public async Task<IActionResult> GetAllUsers(
             int pageNumber = 1,
@@ -33,8 +31,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // GET: api/v1/users/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
@@ -48,7 +44,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // POST: api/v1/users
         [HttpPost]
         public async Task<IActionResult> CreateUser(
             [FromBody] CreateUserDto createUserDto)
@@ -62,8 +57,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // PUT: api/v1/users/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(
             int id,
@@ -78,8 +71,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // DELETE: api/v1/users/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {

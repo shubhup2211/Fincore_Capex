@@ -17,8 +17,6 @@ namespace Fincore.API.Controllers.MasterTable
             this.roleService = roleService;
         }
 
-
-        // GET: api/v1/roles?pageNumber=1&pageSize=10
         [HttpGet]
         public async Task<IActionResult> GetAllRoles(
             int pageNumber = 1,
@@ -33,8 +31,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // GET: api/v1/roles/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRoleById(int id)
         {
@@ -47,8 +43,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // POST: api/v1/roles
         [HttpPost]
         public async Task<IActionResult> CreateRole(
             [FromBody] CreateRoleDto createRoleDto)
@@ -62,8 +56,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // PUT: api/v1/roles/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRole(
             int id,
@@ -78,8 +70,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // DELETE: api/v1/roles/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRole(int id)
         {

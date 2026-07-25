@@ -18,8 +18,6 @@ namespace Fincore.API.Controllers.MasterTable
             this.permissionService = permissionService;
         }
 
-
-        // GET: api/v1/permissions?pageNumber=1&pageSize=10
         [HttpGet]
         public async Task<IActionResult> GetAllPermissions(
             int pageNumber = 1,
@@ -34,8 +32,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // GET: api/v1/permissions/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPermissionById(int id)
         {
@@ -48,8 +44,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // POST: api/v1/permissions
         [HttpPost]
         public async Task<IActionResult> CreatePermission(
             [FromBody] CreatePermissionDto createPermissionDto)
@@ -64,7 +58,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // PUT: api/v1/permissions/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePermission(
             int id,
@@ -80,7 +73,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // DELETE: api/v1/permissions/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePermission(int id)
         {

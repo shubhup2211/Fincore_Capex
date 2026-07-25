@@ -17,8 +17,6 @@ namespace Fincore.API.Controllers.MasterTable
             this.employeeService = employeeService;
         }
 
-
-        // GET: api/v1/employees?pageNumber=1&pageSize=10
         [HttpGet]
         public async Task<IActionResult> GetAllEmployees(
             int pageNumber = 1,
@@ -33,8 +31,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // GET: api/v1/employees/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetEmployeeById(int id)
         {
@@ -47,8 +43,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // POST: api/v1/employees
         [HttpPost]
         public async Task<IActionResult> CreateEmployee(
             [FromBody] CreateEmployeeDto createEmployeeDto)
@@ -62,8 +56,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // PUT: api/v1/employees/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateEmployee(
             int id,
@@ -78,8 +70,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // DELETE: api/v1/employees/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {

@@ -22,8 +22,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             this.mapper = mapper;
         }
 
-
-        // GET ALL VENDORS
         public async Task<ApiResponse<List<VendorDto>>> GetAllVendorsAsync(
             int pageNumber,
             int pageSize)
@@ -74,8 +72,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // GET VENDOR BY ID
         public async Task<ApiResponse<VendorDto>> GetVendorByIdAsync(
             int id)
         {
@@ -113,14 +109,11 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // CREATE VENDOR
         public async Task<ApiResponse<VendorDto>> CreateVendorAsync(
             CreateVendorDto createVendorDto)
         {
             try
             {
-                // Check Vendor Category
                 var vendorCategoryExists =
                     await db.VendorCategories
                         .AnyAsync(x =>
@@ -135,8 +128,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Vendor category with ID {createVendorDto.VendorCategoryId} does not exist.");
                 }
 
-
-                // Check Company
                 var companyExists = await db.Companies
                     .AnyAsync(x =>
                         x.CompanyId ==
@@ -151,7 +142,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check duplicate Vendor Code
                 var vendorCodeExists = await db.Vendors
                     .AnyAsync(x =>
                         x.VendorCode ==
@@ -166,7 +156,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check CreatedBy
                 var createdByExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId ==
@@ -186,7 +175,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
 
                 vendor.VendorId = 0;
 
-                // Auditing
                 vendor.CreatedAt = DateTime.UtcNow;
                 vendor.ModifiedAt = DateTime.UtcNow;
                 vendor.ModifiedBy = createVendorDto.CreatedBy;
@@ -219,15 +207,12 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // UPDATE VENDOR
         public async Task<ApiResponse<VendorDto>> UpdateVendorAsync(
             int id,
             UpdateVendorDto updateVendorDto)
         {
             try
             {
-                // Check Vendor
                 var vendor = await db.Vendors
                     .FirstOrDefaultAsync(
                         x => x.VendorId == id);
@@ -241,7 +226,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check Vendor Category
                 var vendorCategoryExists =
                     await db.VendorCategories
                         .AnyAsync(x =>
@@ -257,7 +241,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check Company
                 var companyExists = await db.Companies
                     .AnyAsync(x =>
                         x.CompanyId ==
@@ -272,7 +255,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check duplicate Vendor Code
                 var vendorCodeExists = await db.Vendors
                     .AnyAsync(x =>
                         x.VendorCode ==
@@ -288,7 +270,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check ModifiedBy
                 var modifiedByExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId ==
@@ -327,7 +308,7 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 vendor.IsActive =
                     updateVendorDto.IsActive;
 
-                // Auditing
+                
                 vendor.ModifiedBy =
                     updateVendorDto.ModifiedBy;
 
@@ -362,8 +343,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // DELETE VENDOR
         public async Task<ApiResponse<bool>> DeleteVendorAsync(
             int id)
         {

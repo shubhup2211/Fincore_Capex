@@ -9,12 +9,9 @@ namespace Fincore.Application.Interfaces.IMasterTable
 
         Task<ApiResponse<DepartmentDTO>> GetDepartmentByIdAsync(int id);
 
-        Task<ApiResponse<DepartmentDTO>> CreateDepartmentAsync(
-            DepartmentDTO departmentDTO);
+        Task<ApiResponse<DepartmentDTO>> CreateDepartmentAsync(DepartmentDTO departmentDTO);
 
-        Task<ApiResponse<DepartmentDTO>> UpdateDepartmentAsync(
-            int id,
-            DepartmentDTO departmentDTO);
+        Task<ApiResponse<DepartmentDTO>> UpdateDepartmentAsync(int id,DepartmentDTO departmentDTO);
 
         Task<ApiResponse<bool>> DeleteDepartmentAsync(int id);
     }

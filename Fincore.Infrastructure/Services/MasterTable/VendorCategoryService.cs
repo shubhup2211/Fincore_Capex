@@ -22,8 +22,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             this.mapper = mapper;
         }
 
-
-        // GET ALL VENDOR CATEGORIES
         public async Task<ApiResponse<List<VendorCategoryDto>>> GetAllVendorCategoriesAsync(
             int pageNumber,
             int pageSize)
@@ -73,8 +71,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // GET VENDOR CATEGORY BY ID
         public async Task<ApiResponse<VendorCategoryDto>> GetVendorCategoryByIdAsync(
             int id)
         {
@@ -110,14 +106,11 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // CREATE VENDOR CATEGORY
         public async Task<ApiResponse<VendorCategoryDto>> CreateVendorCategoryAsync(
             CreateVendorCategoryDto createVendorCategoryDto)
         {
             try
             {
-                // Check duplicate Category Name
                 var categoryNameExists =
                     await db.VendorCategories
                         .AnyAsync(x =>
@@ -133,7 +126,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check CreatedBy
                 var createdByExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId ==
@@ -153,7 +145,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
 
                 vendorCategory.VendorCategoryId = 0;
 
-                // Auditing
                 vendorCategory.CreatedAt = DateTime.UtcNow;
                 vendorCategory.ModifiedAt = DateTime.UtcNow;
                 vendorCategory.ModifiedBy =
@@ -190,14 +181,12 @@ namespace Fincore.Infrastructure.Services.MasterTable
         }
 
 
-        // UPDATE VENDOR CATEGORY
         public async Task<ApiResponse<VendorCategoryDto>> UpdateVendorCategoryAsync(
             int id,
             UpdateVendorCategoryDto updateVendorCategoryDto)
         {
             try
             {
-                // Check Vendor Category
                 var vendorCategory =
                     await db.VendorCategories
                         .FirstOrDefaultAsync(
@@ -212,7 +201,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check duplicate Category Name
                 var categoryNameExists =
                     await db.VendorCategories
                         .AnyAsync(x =>
@@ -229,7 +217,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check ModifiedBy
                 var modifiedByExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId ==
@@ -254,7 +241,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                     updateVendorCategoryDto.IsActive;
 
 
-                // Auditing
                 vendorCategory.ModifiedBy =
                     updateVendorCategoryDto.ModifiedBy;
 
@@ -290,7 +276,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
         }
 
 
-        // DELETE VENDOR CATEGORY
         public async Task<ApiResponse<bool>> DeleteVendorCategoryAsync(
             int id)
         {

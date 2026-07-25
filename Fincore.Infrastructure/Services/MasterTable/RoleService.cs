@@ -22,8 +22,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             this.mapper = mapper;
         }
 
-
-        // GET ALL ROLES
         public async Task<ApiResponse<List<RoleDto>>> GetAllRolesAsync(
             int pageNumber,
             int pageSize)
@@ -69,8 +67,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // GET ROLE BY ID
         public async Task<ApiResponse<RoleDto>> GetRoleByIdAsync(int id)
         {
             try
@@ -101,14 +97,11 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // CREATE ROLE
         public async Task<ApiResponse<RoleDto>> CreateRoleAsync(
             CreateRoleDto createRoleDto)
         {
             try
             {
-                // Check duplicate Role Name
                 var roleExists = await db.Roles
                     .AnyAsync(x =>
                         x.RoleName == createRoleDto.RoleName);
@@ -121,8 +114,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Role with name {createRoleDto.RoleName} already exists.");
                 }
 
-
-                // Check CreatedBy User
                 var createdByExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId == createRoleDto.CreatedBy);
@@ -140,7 +131,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
 
                 role.RoleId = 0;
 
-                // Auditing
                 role.CreatedAt = DateTime.UtcNow;
                 role.ModifiedAt = DateTime.UtcNow;
                 role.ModifiedBy = createRoleDto.CreatedBy;
@@ -169,15 +159,12 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // UPDATE ROLE
         public async Task<ApiResponse<RoleDto>> UpdateRoleAsync(
             int id,
             UpdateRoleDto updateRoleDto)
         {
             try
             {
-                // Check Role
                 var role = await db.Roles
                     .FirstOrDefaultAsync(x => x.RoleId == id);
 
@@ -189,8 +176,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Role with ID {id} does not exist.");
                 }
 
-
-                // Check duplicate Role Name
                 var roleNameExists = await db.Roles
                     .AnyAsync(x =>
                         x.RoleName == updateRoleDto.RoleName &&
@@ -204,8 +189,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Role with name {updateRoleDto.RoleName} already exists.");
                 }
 
-
-                // Check ModifiedBy User
                 var modifiedByExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId == updateRoleDto.ModifiedBy);
@@ -222,8 +205,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 role.RoleName = updateRoleDto.RoleName;
                 role.Description = updateRoleDto.Description;
                 role.IsActive = updateRoleDto.IsActive;
-
-                // Auditing
                 role.ModifiedBy = updateRoleDto.ModifiedBy;
                 role.ModifiedAt = DateTime.UtcNow;
 
@@ -249,8 +230,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // DELETE ROLE
         public async Task<ApiResponse<bool>> DeleteRoleAsync(int id)
         {
             try

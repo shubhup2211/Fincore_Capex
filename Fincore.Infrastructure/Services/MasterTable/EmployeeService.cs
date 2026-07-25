@@ -22,8 +22,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             this.mapper = mapper;
         }
 
-
-        // GET ALL EMPLOYEES
         public async Task<ApiResponse<List<EmployeeDto>>> GetAllEmployeesAsync(
             int pageNumber,
             int pageSize)
@@ -76,8 +74,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // GET EMPLOYEE BY ID
         public async Task<ApiResponse<EmployeeDto>> GetEmployeeByIdAsync(
             int id)
         {
@@ -117,14 +113,11 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // CREATE EMPLOYEE
         public async Task<ApiResponse<EmployeeDto>> CreateEmployeeAsync(
             CreateEmployeeDto createEmployeeDto)
         {
             try
             {
-                // Check duplicate Employee Code
                 var employeeCodeExists = await db.Employees
                     .AnyAsync(x =>
                         x.EmployeeCode == createEmployeeDto.EmployeeCode);
@@ -137,8 +130,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Employee code {createEmployeeDto.EmployeeCode} already exists.");
                 }
 
-
-                // Check User
                 var userExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId == createEmployeeDto.UserId);
@@ -151,8 +142,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"User with ID {createEmployeeDto.UserId} does not exist.");
                 }
 
-
-                // Check whether User is already assigned to Employee
                 var userEmployeeExists = await db.Employees
                     .AnyAsync(x =>
                         x.UserId == createEmployeeDto.UserId);
@@ -166,7 +155,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 }
 
 
-                // Check Department
                 var department = await db.Departments
                     .FirstOrDefaultAsync(x =>
                         x.DepartmentId ==
@@ -180,8 +168,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Department with ID {createEmployeeDto.DepartmentId} does not exist.");
                 }
 
-
-                // Check Designation / Role
                 var designationExists = await db.Roles
                     .AnyAsync(x =>
                         x.RoleId == createEmployeeDto.Designation);
@@ -194,8 +180,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Role with ID {createEmployeeDto.Designation} does not exist.");
                 }
 
-
-                // Check Company
                 var companyExists = await db.Companies
                     .AnyAsync(x =>
                         x.CompanyId == createEmployeeDto.CompanyId);
@@ -208,8 +192,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Company with ID {createEmployeeDto.CompanyId} does not exist.");
                 }
 
-
-                // Department must belong to selected Company
                 if (department.CompanyId != createEmployeeDto.CompanyId)
                 {
                     return ApiResponseHelper.Failure<EmployeeDto>(
@@ -218,8 +200,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Department with ID {createEmployeeDto.DepartmentId} does not belong to company with ID {createEmployeeDto.CompanyId}.");
                 }
 
-
-                // Check Reporting Manager
                 if (createEmployeeDto.ReportingManager.HasValue)
                 {
                     var reportingManager = await db.Employees
@@ -235,7 +215,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                             $"Employee with ID {createEmployeeDto.ReportingManager.Value} does not exist.");
                     }
 
-                    // Manager should belong to same company
                     if (reportingManager.CompanyId !=
                         createEmployeeDto.CompanyId)
                     {
@@ -246,7 +225,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                     }
                 }
 
-
                 var employee =
                     mapper.Map<Employee>(createEmployeeDto);
 
@@ -255,8 +233,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                 await db.Employees.AddAsync(employee);
                 await db.SaveChangesAsync();
 
-
-                // Fetch complete Employee with related data
                 var createdEmployee = await db.Employees
                     .Include(x => x.User)
                     .Include(x => x.Department)
@@ -283,15 +259,12 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // UPDATE EMPLOYEE
         public async Task<ApiResponse<EmployeeDto>> UpdateEmployeeAsync(
             int id,
             UpdateEmployeeDto updateEmployeeDto)
         {
             try
             {
-                // Check Employee
                 var employee = await db.Employees
                     .FirstOrDefaultAsync(x =>
                         x.EmployeeId == id);
@@ -304,8 +277,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Employee with ID {id} does not exist.");
                 }
 
-
-                // Check duplicate Employee Code
                 var employeeCodeExists = await db.Employees
                     .AnyAsync(x =>
                         x.EmployeeCode ==
@@ -320,8 +291,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Employee code {updateEmployeeDto.EmployeeCode} already exists.");
                 }
 
-
-                // Check User
                 var userExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId == updateEmployeeDto.UserId);
@@ -334,8 +303,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"User with ID {updateEmployeeDto.UserId} does not exist.");
                 }
 
-
-                // Check User assigned to another Employee
                 var userEmployeeExists = await db.Employees
                     .AnyAsync(x =>
                         x.UserId == updateEmployeeDto.UserId &&
@@ -349,8 +316,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"User with ID {updateEmployeeDto.UserId} is already linked to another employee.");
                 }
 
-
-                // Check Department
                 var department = await db.Departments
                     .FirstOrDefaultAsync(x =>
                         x.DepartmentId ==
@@ -364,8 +329,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Department with ID {updateEmployeeDto.DepartmentId} does not exist.");
                 }
 
-
-                // Check Designation / Role
                 var designationExists = await db.Roles
                     .AnyAsync(x =>
                         x.RoleId == updateEmployeeDto.Designation);
@@ -378,8 +341,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Role with ID {updateEmployeeDto.Designation} does not exist.");
                 }
 
-
-                // Check Company
                 var companyExists = await db.Companies
                     .AnyAsync(x =>
                         x.CompanyId == updateEmployeeDto.CompanyId);
@@ -392,8 +353,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Company with ID {updateEmployeeDto.CompanyId} does not exist.");
                 }
 
-
-                // Department must belong to Company
                 if (department.CompanyId != updateEmployeeDto.CompanyId)
                 {
                     return ApiResponseHelper.Failure<EmployeeDto>(
@@ -402,8 +361,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Department with ID {updateEmployeeDto.DepartmentId} does not belong to company with ID {updateEmployeeDto.CompanyId}.");
                 }
 
-
-                // Employee cannot report to himself
                 if (updateEmployeeDto.ReportingManager.HasValue &&
                     updateEmployeeDto.ReportingManager.Value == id)
                 {
@@ -413,8 +370,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Employee with ID {id} cannot report to themselves.");
                 }
 
-
-                // Check Reporting Manager
                 if (updateEmployeeDto.ReportingManager.HasValue)
                 {
                     var reportingManager = await db.Employees
@@ -430,8 +385,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                             $"Employee with ID {updateEmployeeDto.ReportingManager.Value} does not exist.");
                     }
 
-
-                    // Manager should belong to same Company
                     if (reportingManager.CompanyId !=
                         updateEmployeeDto.CompanyId)
                     {
@@ -442,8 +395,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                     }
                 }
 
-
-                // Update Employee
                 employee.EmployeeCode =
                     updateEmployeeDto.EmployeeCode;
 
@@ -474,8 +425,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
 
                 await db.SaveChangesAsync();
 
-
-                // Fetch updated Employee
                 var updatedEmployee = await db.Employees
                     .Include(x => x.User)
                     .Include(x => x.Department)
@@ -502,8 +451,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // DELETE EMPLOYEE
         public async Task<ApiResponse<bool>> DeleteEmployeeAsync(int id)
         {
             try
@@ -520,8 +467,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Employee with ID {id} does not exist.");
                 }
 
-
-                // Check whether Employee is a Reporting Manager
                 var hasSubordinates = await db.Employees
                     .AnyAsync(x =>
                         x.ReportingManager == id);
@@ -533,7 +478,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         "EMPLOYEE_HAS_SUBORDINATES",
                         "This employee is currently assigned as a reporting manager.");
                 }
-
 
                 db.Employees.Remove(employee);
 

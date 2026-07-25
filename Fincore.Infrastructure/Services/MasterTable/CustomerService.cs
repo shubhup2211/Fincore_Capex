@@ -22,8 +22,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             this.mapper = mapper;
         }
 
-
-        // GET ALL CUSTOMERS
         public async Task<ApiResponse<List<CustomerDto>>> GetAllCustomersAsync(
             int pageNumber,
             int pageSize)
@@ -72,8 +70,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // GET CUSTOMER BY ID
         public async Task<ApiResponse<CustomerDto>> GetCustomerByIdAsync(
             int id)
         {
@@ -108,14 +104,11 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // CREATE CUSTOMER
         public async Task<ApiResponse<CustomerDto>> CreateCustomerAsync(
             CreateCustomerDto createCustomerDto)
         {
             try
             {
-                // Check User
                 var userExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId == createCustomerDto.UserId);
@@ -128,8 +121,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"User with ID {createCustomerDto.UserId} does not exist.");
                 }
 
-
-                // Check Company
                 var companyExists = await db.Companies
                     .AnyAsync(x =>
                         x.CompanyId == createCustomerDto.CompanyId);
@@ -142,8 +133,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Company with ID {createCustomerDto.CompanyId} does not exist.");
                 }
 
-
-                // Check duplicate Customer Code
                 var customerCodeExists = await db.Customers
                     .AnyAsync(x =>
                         x.CustomerCode == createCustomerDto.CustomerCode);
@@ -188,15 +177,12 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // UPDATE CUSTOMER
         public async Task<ApiResponse<CustomerDto>> UpdateCustomerAsync(
             int id,
             UpdateCustomerDto updateCustomerDto)
         {
             try
             {
-                // Check Customer
                 var customer = await db.Customers
                     .FirstOrDefaultAsync(
                         x => x.CustomerId == id);
@@ -209,8 +195,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Customer with ID {id} does not exist.");
                 }
 
-
-                // Check User
                 var userExists = await db.Users
                     .AnyAsync(x =>
                         x.UserId == updateCustomerDto.UserId);
@@ -223,8 +207,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"User with ID {updateCustomerDto.UserId} does not exist.");
                 }
 
-
-                // Check Company
                 var companyExists = await db.Companies
                     .AnyAsync(x =>
                         x.CompanyId == updateCustomerDto.CompanyId);
@@ -237,8 +219,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
                         $"Company with ID {updateCustomerDto.CompanyId} does not exist.");
                 }
 
-
-                // Check duplicate Customer Code
                 var customerCodeExists = await db.Customers
                     .AnyAsync(x =>
                         x.CustomerCode == updateCustomerDto.CustomerCode &&
@@ -291,8 +271,6 @@ namespace Fincore.Infrastructure.Services.MasterTable
             }
         }
 
-
-        // DELETE CUSTOMER
         public async Task<ApiResponse<bool>> DeleteCustomerAsync(int id)
         {
             try

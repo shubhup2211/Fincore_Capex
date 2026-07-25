@@ -11,13 +11,12 @@ namespace Fincore.API.Controllers.MasterTable
     {
         private readonly ICompanyService companyService;
 
-        // Constructor
+        
         public CompaniesController(ICompanyService companyService)
         {
             this.companyService = companyService;
         }
 
-        // Return response
         private IActionResult GetResponse<T>(ApiResponse<T> result)
         {
             if (result.success)
@@ -33,7 +32,6 @@ namespace Fincore.API.Controllers.MasterTable
             };
         }
 
-        // Create company
         [HttpPost]
         public async Task<IActionResult> CreateCompany(CreateCompanyDto dto)
         {
@@ -42,7 +40,6 @@ namespace Fincore.API.Controllers.MasterTable
             return GetResponse(result);
         }
 
-        // Get all companies
         [HttpGet]
         public async Task<IActionResult> GetAllCompanies(int page = 1, int limit = 10)
         {
@@ -51,7 +48,6 @@ namespace Fincore.API.Controllers.MasterTable
             return GetResponse(result);
         }
 
-        // Get company by id
         [HttpGet("{companyId}")]
         public async Task<IActionResult> GetCompanyById(int companyId)
         {
@@ -60,7 +56,6 @@ namespace Fincore.API.Controllers.MasterTable
             return GetResponse(result);
         }
 
-        // Update company
         [HttpPut]
         public async Task<IActionResult> UpdateCompany(UpdateCompanyDto dto)
         {
@@ -69,7 +64,6 @@ namespace Fincore.API.Controllers.MasterTable
             return GetResponse(result);
         }
 
-        // Delete company
         [HttpDelete("{companyId}")]
         public async Task<IActionResult> DeleteCompany(int companyId)
         {

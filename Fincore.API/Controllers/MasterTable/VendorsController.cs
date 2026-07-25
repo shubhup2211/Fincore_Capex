@@ -17,8 +17,6 @@ namespace Fincore.API.Controllers.MasterTable
             this.vendorService = vendorService;
         }
 
-
-        // GET: api/v1/vendors?pageNumber=1&pageSize=10
         [HttpGet]
         public async Task<IActionResult> GetAllVendors(
             int pageNumber = 1,
@@ -33,8 +31,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // GET: api/v1/vendors/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetVendorById(int id)
         {
@@ -47,8 +43,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // POST: api/v1/vendors
         [HttpPost]
         public async Task<IActionResult> CreateVendor(
             [FromBody] CreateVendorDto createVendorDto)
@@ -62,8 +56,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // PUT: api/v1/vendors/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateVendor(
             int id,
@@ -79,7 +71,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // DELETE: api/v1/vendors/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVendor(int id)
         {

@@ -18,8 +18,6 @@ namespace Fincore.API.Controllers.MasterTable
             this.vendorCategoryService = vendorCategoryService;
         }
 
-
-        // GET: api/v1/vendor-categories?pageNumber=1&pageSize=10
         [HttpGet]
         public async Task<IActionResult> GetAllVendorCategories(
             int pageNumber = 1,
@@ -34,8 +32,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // GET: api/v1/vendor-categories/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetVendorCategoryById(
             int id)
@@ -49,8 +45,6 @@ namespace Fincore.API.Controllers.MasterTable
             return Ok(response);
         }
 
-
-        // POST: api/v1/vendor-categories
         [HttpPost]
         public async Task<IActionResult> CreateVendorCategory(
             [FromBody] CreateVendorCategoryDto createVendorCategoryDto)
@@ -65,7 +59,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // PUT: api/v1/vendor-categories/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateVendorCategory(
             int id,
@@ -83,7 +76,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // DELETE: api/v1/vendor-categories/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVendorCategory(
             int id)

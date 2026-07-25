@@ -17,8 +17,6 @@ namespace Fincore.API.Controllers.MasterTable
             this.customerService = customerService;
         }
 
-
-        // GET: api/v1/customers?pageNumber=1&pageSize=10
         [HttpGet]
         public async Task<IActionResult> GetAllCustomers(
             int pageNumber = 1,
@@ -34,7 +32,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // GET: api/v1/customers/5
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCustomerById(int id)
         {
@@ -48,7 +45,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // POST: api/v1/customers
         [HttpPost]
         public async Task<IActionResult> CreateCustomer(
             [FromBody] CreateCustomerDto createCustomerDto)
@@ -63,7 +59,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // PUT: api/v1/customers/5
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCustomer(
             int id,
@@ -79,7 +74,6 @@ namespace Fincore.API.Controllers.MasterTable
         }
 
 
-        // DELETE: api/v1/customers/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
