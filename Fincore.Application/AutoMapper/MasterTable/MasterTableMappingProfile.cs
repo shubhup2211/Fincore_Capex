@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace Fincore.Application.AutoMapper.MasterTable
 {
-    public class MappingProfile : Profile
+    public class MasterTableMappingProfile : Profile
     {
-        public MappingProfile()
+        public MasterTableMappingProfile()
         {
     
             CreateMap<CreateCompanyDto, Company>();

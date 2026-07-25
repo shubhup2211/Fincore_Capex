@@ -180,8 +180,8 @@ builder.Services.AddScoped<IBudgetCategoryService, BudgetCategoryService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
 builder.Services.AddScoped<IBudgetLineService, BudgetLineService>();
 
+builder.Services.AddAutoMapper(typeof(MasterTableMappingProfile));
 builder.Services.AddAutoMapper(typeof(MappingProfile));
-
 
 
 
@@ -197,10 +197,10 @@ builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<IVendorCategoryService, VendorCategoryService>();
-
-var app = builder.Build();
 builder.Services.AddAutoMapper(typeof(AMCapexRequest));
-var app= builder.Build();
+var app = builder.Build();
+
+
 // -------------------------
 // Configure HTTP Pipeline
 // -------------------------
