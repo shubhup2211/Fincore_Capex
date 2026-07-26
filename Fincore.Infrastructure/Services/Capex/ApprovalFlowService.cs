@@ -2,7 +2,9 @@
 using AutoMapper.QueryableExtensions;
 using Fincore.Application.DTO;
 using Fincore.Application.DTO.Capex;
+using Fincore.Application.DTO.Reports;
 using Fincore.Application.Interfaces.ICapex;
+using Fincore.Domain.Enums;
 using Fincore.Domain.Models;
 using Fincore.Infrastructure.CommonHelper;
 using Fincore.Infrastructure.Data;
@@ -26,13 +28,21 @@ namespace Fincore.Infrastructure.Services.Capex
 
         public async Task<ApiResponse<string>> CreateApprovalFlow(ApprovalFlowDTOPost approvalFlow)
         {
+            if (approvalFlow.MinAmount > approvalFlow.MaxAmount)
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "Invalid Amount Range",
+                    "INVALID_RANGE",
+                    $"MinAmount ({approvalFlow.MinAmount}) cannot be greater than MaxAmount ({approvalFlow.MaxAmount})");
+            }
+
             var add = map.Map<ApprovalFlow>(approvalFlow);
-            add.CreatedAt = DateTime.Now;
+            add.CreatedAt = DateTime.UtcNow;           
 
             await db.ApprovalFlows.AddAsync(add);
             var result = await db.SaveChangesAsync();
 
-            memoryCache.Remove(approvalFlow);
+            memoryCache.Remove($"ApprovalFlow_{add.ApprovalFlowId}");
 
             if (result > 0)
             {
@@ -49,6 +59,7 @@ namespace Fincore.Infrastructure.Services.Capex
             }
         }
 
+
         public async Task<ApiResponse<string>> DeleteApprovalFlow(int id)
         {
             var approvalFlow = await db.ApprovalFlows.FindAsync(id);
@@ -61,16 +72,25 @@ namespace Fincore.Infrastructure.Services.Capex
                     $"Approval Flow with id {id} Not found");
             }
 
-            db.ApprovalFlows.Remove(approvalFlow);
+            if (approvalFlow.IsActive == 0)
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "Approval Flow is already deleted",
+                    "ALREADY_DELETED",
+                    $"Approval Flow with id {id} has already been deleted");
+            }
+
+            approvalFlow.IsActive = 0;
+            approvalFlow.ModifiedAt = DateTime.Now;
             await db.SaveChangesAsync();
 
             return ApiResponseHelper.SuccessRes(
                 $"Approval Flow Deleted Successfully with id {id}");
         }
 
-        public async Task<ApiResponse<List<ApprovalFlowDTOGet>>> GetApprovalFlow(int page, int pagesize)
+        public async Task<ApiResponse<List<ApprovalFlowDTOGet>>> GetApprovalFlow(int page, int pagesize, IsActive? isActive)
         {
-            string cacheKey = $"ApprovalFlow_{page}_{pagesize}";
+            string cacheKey = $"ApprovalFlow_{page}_{pagesize}_{isActive}";
 
             if (memoryCache.TryGetValue(cacheKey, out List<ApprovalFlowDTOGet> approvalFlowList))
             {
@@ -81,7 +101,26 @@ namespace Fincore.Infrastructure.Services.Capex
                     new { page = page, pagesize = pagesize });
             }
 
-            approvalFlowList = await db.ApprovalFlows
+            if (page < 1)
+            {
+                return ApiResponseHelper.Failure<List<ApprovalFlowDTOGet>>(
+                    "Invalid page number.", "INVALID_PAGE", "Page number must be greater than or equal to 1.");
+            }
+
+            if (pagesize < 1)
+            {
+                return ApiResponseHelper.Failure<List<ApprovalFlowDTOGet>>(
+                    "Invalid page size.", "INVALID_PAGE_SIZE", "Page size must be greater than or equal to 1.");
+            }
+
+            IQueryable<ApprovalFlow> query = db.ApprovalFlows.AsQueryable();
+
+            if (isActive.HasValue)
+            {
+                query = query.Where(x => x.IsActive == (int)isActive.Value);
+            }
+
+            approvalFlowList = await query
                 .Skip((page - 1) * pagesize)
                 .Take(pagesize)
                 .ProjectTo<ApprovalFlowDTOGet>(map.ConfigurationProvider)
@@ -117,7 +156,7 @@ namespace Fincore.Infrastructure.Services.Capex
             }
 
             approvalFlow = await db.ApprovalFlows
-                .Where(x => x.ApprovalFlowId == id)
+                .Where(x => x.ApprovalFlowId == id && x.IsActive==1)
                 .ProjectTo<ApprovalFlowDTOGet>(map.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
@@ -138,7 +177,7 @@ namespace Fincore.Infrastructure.Services.Capex
         public async Task<ApiResponse<string>> UpdateApprovalFlow(int id, ApprovalFlowDTOPost approvalFlow)
         {
             var update = await db.ApprovalFlows
-                .FirstOrDefaultAsync(x => x.ApprovalFlowId == id);
+                .FirstOrDefaultAsync(x => x.ApprovalFlowId == id && x.IsActive == 1);
 
             if (update == null)
             {
@@ -148,8 +187,16 @@ namespace Fincore.Infrastructure.Services.Capex
                     $"Approval Flow with id {id} Not found");
             }
 
-            update.ModifiedAt = DateTime.UtcNow;
+            if (approvalFlow.MinAmount > approvalFlow.MaxAmount)
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "Invalid Amount Range",
+                    "INVALID_RANGE",
+                    $"MinAmount ({approvalFlow.MinAmount}) cannot be greater than MaxAmount ({approvalFlow.MaxAmount})");
+            }
 
+           
+            update.ModifiedAt = DateTime.UtcNow;
             map.Map(approvalFlow, update);
 
             await db.SaveChangesAsync();
@@ -164,7 +211,7 @@ namespace Fincore.Infrastructure.Services.Capex
         public async Task<ApiResponse<ApprovalFlowDTOGet>> GetApprovalFlowByAmount(decimal amount)
         {
             var approvalFlow = await db.ApprovalFlows
-                .Where(x => amount >= x.MinAmount && amount <= x.MaxAmount)
+                .Where(x => amount >= x.MinAmount && amount <= x.MaxAmount && x.IsActive==1)
                 .ProjectTo<ApprovalFlowDTOGet>(map.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
@@ -185,7 +232,7 @@ namespace Fincore.Infrastructure.Services.Capex
         public async Task<ApiResponse<List<ApprovalFlowDTOGet>>> GetApprovalFlowByRole(int roleId)
         {
             var approvalFlowList = await db.ApprovalFlows
-                .Where(x => x.RequiredRoleId == roleId)
+                .Where(x => x.RequiredRoleId == roleId && x.IsActive == 1)
                 .ProjectTo<ApprovalFlowDTOGet>(map.ConfigurationProvider)
                 .ToListAsync();
 

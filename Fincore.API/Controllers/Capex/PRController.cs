@@ -1,6 +1,9 @@
-﻿using Fincore.Application.DTO.Capex;
+﻿using Fincore.Application.Constants;
+using Fincore.Application.DTO.Capex;
 using Fincore.Application.Interfaces.ICapex;
+using Fincore.Domain.Enums;
 using Fincore.Infrastructure.Services.Capex;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NPOI.SS.UserModel;
@@ -19,9 +22,9 @@ namespace Fincore.API.Controllers.Capex
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetPurchaseRequisition(int page=1,int pagesize=10) 
+        public async Task<IActionResult> GetPurchaseRequisition(int page=1,int pagesize=10, IsActive? status=null, Domain.Enums.ApprovalStatus? approvalStatus = null) 
         {
-            var response = await pRService.GetPR(page,pagesize);
+            var response = await pRService.GetPR(page,pagesize,status,approvalStatus);
             return Ok(response);
         }
 

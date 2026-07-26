@@ -1,5 +1,6 @@
 ﻿using Fincore.Application.DTO;
 using Fincore.Application.DTO.Capex;
+using Fincore.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Fincore.Application.Interfaces.ICapex
         Task<ApiResponse<string>> UpdateRFQ(int id, RFQDTOPost rfq);
         Task<ApiResponse<string>> DeleteRFQ(int id);
         Task<ApiResponse<RFQDTOGet>> GetRFQById(int id);
-        Task<ApiResponse<List<RFQDTOGet>>> GetRFQ(int page, int pagesize);
+        Task<ApiResponse<List<RFQDTOGet>>> GetRFQ(int page, int pagesize, IsActive? isActive);
         Task<ApiResponse<string>> SendRFQ(int id);
         Task<ApiResponse<List<QuotationDTOGet>>> GetRFQQuotations(int id);
 

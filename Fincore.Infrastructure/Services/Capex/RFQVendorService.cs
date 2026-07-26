@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using Fincore.Application.DTO;
 using Fincore.Application.DTO.Capex;
 using Fincore.Application.Interfaces.ICapex;
+using Fincore.Domain.Enums;
 using Fincore.Domain.Models;
 using Fincore.Infrastructure.CommonHelper;
 using Fincore.Infrastructure.Data;
@@ -59,9 +60,9 @@ namespace Fincore.Infrastructure.Services.Capex
             return ApiResponseHelper.SuccessRes($"RFQ Vendor Deleted Successfully with id {id}");
         }
 
-        public async Task<ApiResponse<List<RFQVendorDTOGet>>> GetRFQVendor(int page, int pagesize)
+        public async Task<ApiResponse<List<RFQVendorDTOGet>>> GetRFQVendor(int page, int pagesize, ResponseStatus? responseStatus)
         {
-            string cacheKey = $"RFQVendor_{page}_{pagesize}";
+            string cacheKey = $"RFQVendor_{page}_{pagesize}_{responseStatus}";
 
             if (memoryCache.TryGetValue(cacheKey, out List<RFQVendorDTOGet> RFQVendorlist))
             {
@@ -72,7 +73,26 @@ namespace Fincore.Infrastructure.Services.Capex
                     new { page = page, pagesize = pagesize });
             }
 
-            RFQVendorlist = await db.RFQVendors
+            if (page < 1)
+            {
+                return ApiResponseHelper.Failure<List<RFQVendorDTOGet>>(
+                    "Invalid page number.", "INVALID_PAGE", "Page number must be greater than or equal to 1.");
+            }
+
+            if (pagesize < 1)
+            {
+                return ApiResponseHelper.Failure<List<RFQVendorDTOGet>>(
+                    "Invalid page size.", "INVALID_PAGE_SIZE", "Page size must be greater than or equal to 1.");
+            }
+
+            IQueryable<RFQVendor> query = db.RFQVendors.AsQueryable();
+
+            if (responseStatus.HasValue)
+            {
+                query = query.Where(x=> x.ResponseStatus == responseStatus.Value.ToString());
+            }
+
+            RFQVendorlist = await query
                 .Skip((page - 1) * pagesize)
                 .Take(pagesize)
                 .ProjectTo<RFQVendorDTOGet>(map.ConfigurationProvider)

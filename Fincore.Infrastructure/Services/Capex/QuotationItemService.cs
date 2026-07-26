@@ -27,10 +27,12 @@ namespace Fincore.Infrastructure.Services.Capex
         public async Task<ApiResponse<string>> CreateQuotationItem(QuotationItemDTOPost quotationItem)
         {
             var add = map.Map<QuotationItem>(quotationItem);
-            
+
+            add.LineTotal = CalculateLineTotal(add.Quantity, add.UnitPrice, add.TaxPercentage, add.Discount);
+
             await db.QuotationItems.AddAsync(add);
             var result = await db.SaveChangesAsync();
-            memoryCache.Remove(quotationItem);
+            memoryCache.Remove($"QuotationItem_{add.QuotationItemId}");
 
             if (result > 0)
             {
@@ -87,6 +89,19 @@ namespace Fincore.Infrastructure.Services.Capex
                     "No Data to show");
             }
 
+
+            if (page < 1)
+            {
+                return ApiResponseHelper.Failure<List<QuotationItemDTOGet>>(
+                    "Invalid page number.", "INVALID_PAGE", "Page number must be greater than or equal to 1.");
+            }
+
+            if (pagesize < 1)
+            {
+                return ApiResponseHelper.Failure<List<QuotationItemDTOGet>>(
+                    "Invalid page size.", "INVALID_PAGE_SIZE", "Page size must be greater than or equal to 1.");
+            }
+
             memoryCache.Set(cacheKey, QuotationItemlist);
 
             return ApiResponseHelper.SuccessRes(
@@ -140,12 +155,21 @@ namespace Fincore.Infrastructure.Services.Capex
             }
 
             map.Map(quotationItem, update);
+            update.LineTotal = CalculateLineTotal(update.Quantity, update.UnitPrice, update.TaxPercentage, update.Discount);
             await db.SaveChangesAsync();
 
             string cache = $"{id}";
             memoryCache.Remove(cache);
 
             return ApiResponseHelper.SuccessRes($"Quotation Item Updated Successfully with id {id}");
+        }
+
+        private decimal CalculateLineTotal(decimal quantity, decimal unitPrice, decimal taxPercentage, decimal discount)
+        {
+            decimal subtotal = quantity * unitPrice;
+            decimal taxAmount = (subtotal * taxPercentage) / 100;
+            decimal total = subtotal + taxAmount - discount;
+            return total;
         }
     }
 }

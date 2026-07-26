@@ -8,7 +8,7 @@ namespace Fincore.Application.DTO.Capex
 {
     public class ApprovalFlowDTOPost
     {
-        public int ApprovalFlowId { get; set; }
+        public int? ApprovalFlowId { get; set; }
         public decimal? MinAmount { get; set; }
         public decimal? MaxAmount { get; set; }
         public int ApprovalLevel { get; set; }

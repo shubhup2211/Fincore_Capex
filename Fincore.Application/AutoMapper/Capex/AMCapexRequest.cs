@@ -15,10 +15,14 @@ namespace Fincore.Application.AutoMapper.Capex
         {
             //Capex Request
             CreateMap<CapexRequest, CapexReqDTOPost>().ReverseMap();
+            CreateMap<CapexReqDTOPost, CapexRequest>()
+              .ForMember(dest => dest.CapexRequestId, opt => opt.Ignore());
             CreateMap<CapexRequest, CapexReqDTOGet>();
 
             //PR 
             CreateMap<PurchaseRequisition, PRDTOPost>().ReverseMap();
+            CreateMap<PRDTOPost, PurchaseRequisition>()
+             .ForMember(dest => dest.PurchaseRequisitionId, opt => opt.Ignore());
             CreateMap<PurchaseRequisition, PRDTOGet>()
                 .ForMember(x => x.VendorCode, x => x.MapFrom(x => x.Vendor.VendorCode != null ? x.Vendor.VendorCode : "Not Available"))
                 .ForMember(x => x.RequestedByName, x => x.MapFrom(x => x.RequestedByUser.FullName != null ? x.RequestedByUser.FullName : "Not Available"))
@@ -28,12 +32,16 @@ namespace Fincore.Application.AutoMapper.Capex
 
             //PRItem
             CreateMap<PurchaseRequisitionItem, PRItemDTOPost>().ReverseMap();
+            CreateMap<PRItemDTOPost, PurchaseRequisitionItem>()
+              .ForMember(dest => dest.PRItemId, opt => opt.Ignore());
             CreateMap<PurchaseRequisitionItem, PRItemDTOGet>()
                 .ForMember(x => x.PRName, x => x.MapFrom(x => x.PurchaseRequisition.PRTitle != null ? x.PurchaseRequisition.PRTitle : "Not Available"))
                 .ForMember(x => x.Category, x => x.MapFrom(x => x.VendorCategory.CategoryName != null ? x.VendorCategory.CategoryName : "Not Available"));
 
             //RFQ
             CreateMap<RFQ, RFQDTOPost>().ReverseMap();
+            CreateMap<RFQDTOPost, RFQ>()
+              .ForMember(dest => dest.RFQId, opt => opt.Ignore());
             CreateMap<RFQ, RFQDTOGet>()
                 .ForMember(x => x.PRName, x => x.MapFrom(x => x.PurchaseRequisition.PRTitle != null ? x.PurchaseRequisition.PRTitle : "Not Available"))
                 .ForMember(x => x.VendorCode, x => x.MapFrom(x => x.Vendor.VendorCode != null ? x.Vendor.VendorCode : "Not Available"))
@@ -41,24 +49,32 @@ namespace Fincore.Application.AutoMapper.Capex
 
             //RFQVendor
             CreateMap<RFQVendor, RFQVendorDTOPost>().ReverseMap();
+            CreateMap<RFQVendorDTOPost, RFQVendor>()
+              .ForMember(dest => dest.RFQVendorId, opt => opt.Ignore());
             CreateMap<RFQVendor, RFQVendorDTOGet>()
                 .ForMember(x => x.RFQTitle, x => x.MapFrom(x => x.RFQ.Title != null ? x.RFQ.Title : "Not Available"))
                 .ForMember(x => x.VendorCode, x => x.MapFrom(x => x.Vendor.VendorCode != null ? x.Vendor.VendorCode : "Not Available"));
 
             //Quotation
             CreateMap<Quotation, QuotationDTOPost>().ReverseMap();
+            CreateMap<QuotationDTOPost, Quotation>()
+             .ForMember(dest => dest.QuotationId, opt => opt.Ignore());
             CreateMap<Quotation, QuotationDTOGet>()
                 .ForMember(x => x.RFQTitle, x => x.MapFrom(x => x.RFQ.Title != null ? x.RFQ.Title : "Not Available"))
                 .ForMember(x => x.VendorCode, x => x.MapFrom(x => x.Vendor.VendorCode != null ? x.Vendor.VendorCode : "Not Available"));
 
             //QuotationItem
             CreateMap<QuotationItem, QuotationItemDTOPost>().ReverseMap();
+            CreateMap<QuotationItemDTOPost, QuotationItem>()
+                .ForMember(dest => dest.QuotationItemId, opt => opt.Ignore());
             CreateMap<QuotationItem, QuotationItemDTOGet>()
                 .ForMember(x => x.QuotationNumber, x => x.MapFrom(x => x.Quotation.QuotationNumber != null ? x.Quotation.QuotationNumber : "Not Available"))
                 .ForMember(x => x.PRItemName, x => x.MapFrom(x => x.PurchaseRequisitionItem.ItemName != null ? x.PurchaseRequisitionItem.ItemName : "Not Available"));
 
             //VendorSelection
             CreateMap<VendorSelection, VendorSelectionDTOPost>().ReverseMap();
+            CreateMap<VendorSelectionDTOPost, VendorSelection>()
+                .ForMember(dest => dest.VendorSelectionId, opt => opt.Ignore());
             CreateMap<VendorSelection, VendorSelectionDTOGet>()
                 .ForMember(x => x.RFQTitle, x => x.MapFrom(x => x.RFQ.Title != null ? x.RFQ.Title : "Not Available"))
                 .ForMember(x => x.QuotationNumber, x => x.MapFrom(x => x.Quotation.QuotationNumber != null ? x.Quotation.QuotationNumber : "Not Available"))
@@ -66,8 +82,10 @@ namespace Fincore.Application.AutoMapper.Capex
                 .ForMember(x => x.SelectedBy, x => x.MapFrom(x => x.SelectedByUser.FullName != null ? x.SelectedByUser.FullName : "Not Available"));
 
             //Approval Flow
-            //Quotation
+            
             CreateMap<ApprovalFlow, ApprovalFlowDTOPost>().ReverseMap();
+            CreateMap<ApprovalFlowDTOPost, ApprovalFlow>()
+                .ForMember(dest => dest.ApprovalFlowId, opt => opt.Ignore());
             CreateMap<ApprovalFlow, ApprovalFlowDTOGet>()                
                 .ForMember(x => x.RequiredRole, x => x.MapFrom(x => x.RequiredRole.RoleName != null ? x.RequiredRole.RoleName : "Not Available"));
 

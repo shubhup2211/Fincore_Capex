@@ -1,5 +1,6 @@
 ﻿using Fincore.Application.DTO.Capex;
 using Fincore.Application.Interfaces.ICapex;
+using Fincore.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Fincore.API.Controllers.Capex
@@ -16,9 +17,9 @@ namespace Fincore.API.Controllers.Capex
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetApprovalFlow(int page = 1, int pagesize = 10)
+        public async Task<IActionResult> GetApprovalFlow(int page = 1, int pagesize = 10, IsActive? isActive = null)
         {
-            var response = await approvalFlowService.GetApprovalFlow(page, pagesize);
+            var response = await approvalFlowService.GetApprovalFlow(page, pagesize,isActive);
             return Ok(response);
         }
 

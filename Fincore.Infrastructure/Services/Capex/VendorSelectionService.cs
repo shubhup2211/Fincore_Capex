@@ -73,6 +73,18 @@ namespace Fincore.Infrastructure.Services.Capex
                     new { page = page, pagesize = pagesize });
             }
 
+            if (page < 1)
+            {
+                return ApiResponseHelper.Failure<List<VendorSelectionDTOGet>>(
+                    "Invalid page number.", "INVALID_PAGE", "Page number must be greater than or equal to 1.");
+            }
+
+            if (pagesize < 1)
+            {
+                return ApiResponseHelper.Failure<List<VendorSelectionDTOGet>>(
+                    "Invalid page size.", "INVALID_PAGE_SIZE", "Page size must be greater than or equal to 1.");
+            }
+
             VendorSelectionlist = await db.VendorSelections
                 .Skip((page - 1) * pagesize)
                 .Take(pagesize)
@@ -86,6 +98,7 @@ namespace Fincore.Infrastructure.Services.Capex
                     "EMPTY_DATA",
                     "No Data to show");
             }
+
 
             memoryCache.Set(cacheKey, VendorSelectionlist);
 

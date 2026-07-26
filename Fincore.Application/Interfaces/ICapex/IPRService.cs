@@ -1,10 +1,13 @@
-﻿using Fincore.Application.DTO;
+﻿using Fincore.Application.Constants;
+using Fincore.Application.DTO;
 using Fincore.Application.DTO.Capex;
+using Fincore.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace Fincore.Application.Interfaces.ICapex
 {
@@ -14,7 +17,7 @@ namespace Fincore.Application.Interfaces.ICapex
         Task<ApiResponse<string>> UpdatePR(int id, PRDTOPost pr);
         Task<ApiResponse<string>> DeletePR(int id);
         Task<ApiResponse<PRDTOGet>> GetPRById(int id);
-        Task<ApiResponse<List<PRDTOGet>>> GetPR(int page,int pagesize);
+        Task<ApiResponse<List<PRDTOGet>>> GetPR(int page,int pagesize, IsActive? IsActive, Domain.Enums.ApprovalStatus? ApprovalStatus);
 
         Task<ApiResponse<string>> SubmitPR(int id);
         Task<ApiResponse<string>> ApprovePR(int id);

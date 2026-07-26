@@ -27,11 +27,22 @@ namespace Fincore.Infrastructure.Services.Capex
 
         public async Task<ApiResponse<string>> CreateQuotation(QuotationDTOPost quotation)
         {
+            if (quotation.QuotedAmount <= 0)
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "Invalid Quoted Amount",
+                    "VALIDATION_ERROR",
+                    "QuotedAmount must be greater than zero");
+            }
+
+            quotation.QuotationNumber = await GenerateUniqueQuotationNumber();
+
             var add = map.Map<Quotation>(quotation);
             add.CreatedAt = DateTime.Now;
+            add.IsSelected = 0;
             await db.Quotations.AddAsync(add);
             var result = await db.SaveChangesAsync();
-            memoryCache.Remove(quotation);
+            memoryCache.Remove($"Quotation_{add.QuotationId}");
 
             if (result > 0)
             {
@@ -85,6 +96,18 @@ namespace Fincore.Infrastructure.Services.Capex
                     "Quotations fetched successfully",
                     Quotationlist.Count,
                     new { page = page, pagesize = pagesize });
+            }
+
+            if (page < 1)
+            {
+                return ApiResponseHelper.Failure<List<QuotationDTOGet>>(
+                    "Invalid page number.", "INVALID_PAGE", "Page number must be greater than or equal to 1.");
+            }
+
+            if (pagesize < 1)
+            {
+                return ApiResponseHelper.Failure<List<QuotationDTOGet>>(
+                    "Invalid page size.", "INVALID_PAGE_SIZE", "Page size must be greater than or equal to 1.");
             }
 
             Quotationlist = await db.Quotations
@@ -152,6 +175,15 @@ namespace Fincore.Infrastructure.Services.Capex
                     "NOT_FOUND",
                     $"Quotation with id {id} Not found");
             }
+
+            if (quotation.QuotedAmount <= 0)
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "Invalid Quoted Amount",
+                    "VALIDATION_ERROR",
+                    "QuotedAmount must be greater than zero");
+            }
+
             var rfqVendor = await db.RFQVendors
               .FirstOrDefaultAsync(x =>
               x.RFQId == update.RFQId &&
@@ -165,9 +197,11 @@ namespace Fincore.Infrastructure.Services.Capex
                     "Submitted quotations cannot be modified.");
             }
 
-            update.ModifiedAt = DateTime.UtcNow;
+            string qNum = update.QuotationNumber;
 
             map.Map(quotation, update);
+            update.QuotationNumber = qNum;
+            update.ModifiedAt = DateTime.UtcNow;
             await db.SaveChangesAsync();
 
             string cache = $"{id}";
@@ -260,6 +294,34 @@ namespace Fincore.Infrastructure.Services.Capex
                 quotations,
                 "RFQ quotations fetched successfully",
                 quotations.Count);
+        }
+
+        private async Task<string> GenerateUniqueQuotationNumber()
+        {
+            string quotationNumber;
+            bool isUnique;
+
+            do
+            {
+                // Format: QT-YYYYMMDD-XXXXX
+                string datePart = DateTime.UtcNow.ToString("yyyyMMdd");
+
+                var todayStart = DateTime.UtcNow.Date;
+                var todayEnd = todayStart.AddDays(1);
+
+                var todayCount = await db.Quotations
+                    .Where(x => x.CreatedAt >= todayStart && x.CreatedAt < todayEnd)
+                    .CountAsync();
+
+                string sequencePart = (todayCount + 1).ToString("D5");
+
+                quotationNumber = $"QT-{datePart}-{sequencePart}";
+
+                isUnique = !await db.Quotations.AnyAsync(x => x.QuotationNumber == quotationNumber);
+
+            } while (!isUnique);
+
+            return quotationNumber;
         }
     }
 }

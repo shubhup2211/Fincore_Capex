@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Fincore.Application.AutoMapper.Capex;
+using Fincore.Application.Constants;
 using Fincore.Application.DTO;
 using Fincore.Application.DTO.Capex;
 using Fincore.Application.Interfaces.ICapex;
+using Fincore.Domain.Enums;
 using Fincore.Domain.Models;
 using Fincore.Infrastructure.CommonHelper;
 using Fincore.Infrastructure.Data;
@@ -32,7 +34,7 @@ namespace Fincore.Infrastructure.Services.Capex
         public async Task<ApiResponse<string>> CreatePR(PRDTOPost pr)
         {
             var add = map.Map<PurchaseRequisition>(pr);
-            add.CreatedAt = DateTime.Now;
+            add.CreatedAt = DateTime.UtcNow;
             add.ApprovalStatus = "Draft";
             await db.PurchaseRequisitions.AddAsync(add);
             var result = await db.SaveChangesAsync();
@@ -61,16 +63,42 @@ namespace Fincore.Infrastructure.Services.Capex
 
             }
 
-            db.PurchaseRequisitions.Remove(pr);
+            if (pr.IsActive == 0)
+            {
+                return ApiResponseHelper.Failure<string>(
+                                   "Purchase Requistion is already Deleted", "ALREADY_DELETED", $"Purchase Requistion with id {id} has already been deleted");
+
+            }
+
+            //check PR has child
+            bool hasPRItem = await db.PurchaseRequisitionItems.AnyAsync(x=> x.PurchaseRequisitionId == id);
+            if (hasPRItem)
+            {
+                return ApiResponseHelper.Failure<string>(
+                                   "Cannot Delete Purchase Requistion", "DELETE_RESTRICTED", $"Purchase Requistion with id {id} cannot be deleted because its linked to PRItem");
+
+            }
+
+            bool hasRFQ = await db.RFQs.AnyAsync(x => x.PurchaseRequisitionId == id);
+            if (hasRFQ)
+            {
+                return ApiResponseHelper.Failure<string>(
+                                   "Cannot Delete Purchase Requistion", "DELETE_RESTRICTED", $"Purchase Requistion with id {id} cannot be deleted because its linked to RFQ");
+
+            }
+
+            pr.IsActive = 0;
+            pr.ModifiedAt = DateTime.UtcNow;
+            
             await db.SaveChangesAsync();
 
             return ApiResponseHelper.SuccessRes($"Purchase Requistion Deleted Successfully with id {id}");
 
         }
 
-        public async Task<ApiResponse<List<PRDTOGet>>> GetPR(int page, int pagesize)
+        public async Task<ApiResponse<List<PRDTOGet>>> GetPR(int page, int pagesize, IsActive? isActive, Domain.Enums.ApprovalStatus? approvalStatus)
         {
-            string cacheKey = $"PR_{page}_{pagesize}";
+            string cacheKey = $"PR_{page}_{pagesize}_{isActive}_{approvalStatus}";
 
             if(memoryCache.TryGetValue(cacheKey, out List<PRDTOGet> PRlist))
             {
@@ -78,12 +106,37 @@ namespace Fincore.Infrastructure.Services.Capex
                     PRlist,"Purchase Requistions fetched successfully", PRlist.Count, new {page=page,pagesize=pagesize} );
             }
 
-            PRlist = await db.PurchaseRequisitions
+            if (page < 1)
+            {
+                return ApiResponseHelper.Failure<List<PRDTOGet>>(
+                    "Invalid page number.", "INVALID_PAGE", "Page number must be greater than or equal to 1.");
+            }
+
+            if (pagesize < 1)
+            {
+                return ApiResponseHelper.Failure<List<PRDTOGet>>(
+                    "Invalid page size.", "INVALID_PAGE_SIZE", "Page size must be greater than or equal to 1.");
+            }
+
+            IQueryable<PurchaseRequisition> query = db.PurchaseRequisitions.AsQueryable();
+
+            if (isActive.HasValue)
+            {
+                query = query.Where(x => x.IsActive == (int)isActive.Value);
+            }
+
+            if (approvalStatus.HasValue)
+            {
+                query = query.Where(x =>
+                    x.ApprovalStatus == approvalStatus.Value.ToString());
+            }
+
+            PRlist = await query
                 .Skip((page - 1 ) * pagesize).Take(pagesize)
                 .ProjectTo<PRDTOGet>(map.ConfigurationProvider)
                 .ToListAsync();
 
-            if(PRlist==null & !PRlist.Any())
+            if(PRlist==null && !PRlist.Any())
             {
                 return ApiResponseHelper.Failure<List<PRDTOGet>>(
                     "Purchase Requistions not found", "EMPTY_DATA", "No Data to show");
@@ -107,7 +160,7 @@ namespace Fincore.Infrastructure.Services.Capex
             }
 
             pr = await db.PurchaseRequisitions
-                .Where(x=> x.PurchaseRequisitionId == id)
+                .Where(x=> x.PurchaseRequisitionId == id && x.IsActive==1)
                 .ProjectTo<PRDTOGet>(map.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
@@ -117,13 +170,15 @@ namespace Fincore.Infrastructure.Services.Capex
                     "Purchase Requistion Record not found", "NOT_FOUND", $"Purchase Requistion with Id {id} not found");
             }
 
+            memoryCache.Set (cacheKey, pr);
+
             return ApiResponseHelper.SuccessRes(
                     pr, $"Purchase Requistion with Id {id} found", 1);
         }
 
         public async Task<ApiResponse<string>> UpdatePR(int id, PRDTOPost pr)
         {
-           var update = await db.PurchaseRequisitions.FirstOrDefaultAsync(x=> x.PurchaseRequisitionId==id);
+           var update = await db.PurchaseRequisitions.FirstOrDefaultAsync(x=> x.PurchaseRequisitionId==id && x.IsActive == 1);
 
             if (update == null)
             {
@@ -147,7 +202,7 @@ namespace Fincore.Infrastructure.Services.Capex
         public async Task<ApiResponse<string>> SubmitPR(int id)
         {
             var res = await db.PurchaseRequisitions
-                .FirstOrDefaultAsync(x => x.PurchaseRequisitionId == id);
+                .FirstOrDefaultAsync(x => x.PurchaseRequisitionId == id && x.IsActive == 1);
 
             if (res == null)
             {
@@ -165,16 +220,16 @@ namespace Fincore.Infrastructure.Services.Capex
                     $"Purchase Requisition with id {id} is already submitted");
             }
 
-            if (res.ApprovalStatus != "Submitted" || res.ApprovalStatus != "Draft" )
+            if (res.ApprovalStatus == "Approved" || res.ApprovalStatus == "Rejected")
             {
                 return ApiResponseHelper.Failure<string>(
-                    "Purchase Requisition Already Approved or Rejected",
-                    "ALREADY_SUBMITTED",
-                    $"Purchase Requisition with id {id} is already Approved or Rejected");
+                    "Cannot submit already processed PR",
+                    "INVALID_STATUS",
+                    $"PR with id {id} is already {res.ApprovalStatus}");
             }
 
             res.ApprovalStatus = "Submitted";
-            res.ModifiedAt = DateTime.Now;
+            res.ModifiedAt = DateTime.UtcNow;
 
             await db.SaveChangesAsync();
 
@@ -187,7 +242,7 @@ namespace Fincore.Infrastructure.Services.Capex
         //Approve Purchase Requisition
         public async Task<ApiResponse<string>> ApprovePR(int id)
         {
-            var res = await db.PurchaseRequisitions.FirstOrDefaultAsync(x => x.PurchaseRequisitionId == id);
+            var res = await db.PurchaseRequisitions.FirstOrDefaultAsync(x => x.PurchaseRequisitionId == id && x.IsActive == 1);
 
             if (res == null)
             {
@@ -206,8 +261,8 @@ namespace Fincore.Infrastructure.Services.Capex
             }
 
             res.ApprovalStatus = "Approved";
-            res.ApprovedAt = DateTime.Now;
-            res.ModifiedAt = DateTime.Now;
+            res.ApprovedAt = DateTime.UtcNow;
+            res.ModifiedAt = DateTime.UtcNow;
 
             await db.SaveChangesAsync();
 
@@ -221,7 +276,7 @@ namespace Fincore.Infrastructure.Services.Capex
         //Reject Purchase Requisition
         public async Task<ApiResponse<string>> RejectPR(int id)
         {
-            var res = await db.PurchaseRequisitions.FirstOrDefaultAsync(x => x.PurchaseRequisitionId == id);
+            var res = await db.PurchaseRequisitions.FirstOrDefaultAsync(x => x.PurchaseRequisitionId == id && x.IsActive == 1);
 
             if (res == null)
             {
@@ -240,7 +295,7 @@ namespace Fincore.Infrastructure.Services.Capex
             }
 
             res.ApprovalStatus = "Rejected";
-            res.ModifiedAt = DateTime.Now;
+            res.ModifiedAt = DateTime.UtcNow;
 
             await db.SaveChangesAsync();
 

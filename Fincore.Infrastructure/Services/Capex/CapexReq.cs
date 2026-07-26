@@ -39,7 +39,7 @@ namespace Fincore.Infrastructure.Services.Capex
             raise.CreatedAt = DateTime.Now;
             await db.CapexRequests.AddAsync(raise);
             int result = await db.SaveChangesAsync();
-            memoryCache.Remove(result);
+            memoryCache.Remove($"Capex_{raise.CapexRequestId}");
 
             if (result > 0)
             {
@@ -64,6 +64,18 @@ namespace Fincore.Infrastructure.Services.Capex
             {
                 return ApiResponseHelper.SuccessRes(
                     capexlist, "Capex list Fetched Successfully", capexlist.Count, new { page = page,pageSize = pageSize });
+            }
+
+            if (page < 1)
+            {
+                return ApiResponseHelper.Failure<List<CapexReqDTOGet>>(
+                    "Invalid page number.", "INVALID_PAGE", "Page number must be greater than or equal to 1.");
+            }
+
+            if (pageSize < 1)
+            {
+                return ApiResponseHelper.Failure<List<CapexReqDTOGet>>(
+                    "Invalid page size.", "INVALID_PAGE_SIZE", "Page size must be greater than or equal to 1.");
             }
 
             //Use AutoMapper to fetch
@@ -252,28 +264,21 @@ namespace Fincore.Infrastructure.Services.Capex
                     "Only Submitted Capex Requests can be Approved");
             }
 
-            //if (res.ApprovalStatus == "Approved")
-            //{
-            //    return ApiResponseHelper.Failure<string>(
-            //        "CapexRequest Already Approved",
-            //        "ALREADY_APPROVED",
-            //        $"Capex Request with id {id} is already approved");
-            //}
 
-            // Check Approval Flow for the Amount
-            var approvalFlow = await db.ApprovalFlows
+            var budgetLine = await db.BudgetLines
                 .FirstOrDefaultAsync(x =>
-                    x.IsActive == 1 &&
-                    res.Amount >= x.MinAmount &&
-                    res.Amount <= x.MaxAmount);
+                    x.BudgetLineId == res.BudgetLineId &&
+                    x.IsActive == 1);
 
-            if (approvalFlow == null)
+            if (budgetLine == null)
             {
                 return ApiResponseHelper.Failure<string>(
-                    "Approval Flow Not Configured",
-                    "APPROVAL_FLOW_NOT_FOUND",
-                    $"No Approval Flow configured for amount {res.Amount}");
+                    "Budget Line Not Found",
+                    "BUDGET_NOT_FOUND",
+                    "Budget Line is inactive or does not exist.");
             }
+
+            budgetLine.UtilizedAmount = (budgetLine.UtilizedAmount ?? 0) + res.Amount;
 
             res.ApprovalStatus = "Approved";
             res.ApprovedAt = DateTime.Now;
@@ -308,14 +313,6 @@ namespace Fincore.Infrastructure.Services.Capex
                     "INVALID_STATUS",
                     "Only Submitted Capex Requests can be Rejected");
             }
-
-            //if (res.ApprovalStatus == "Rejected")
-            //{
-            //    return ApiResponseHelper.Failure<string>(
-            //        "CapexRequest Already Rejected",
-            //        "ALREADY_REJECTED",
-            //        $"Capex Request with id {id} is already rejected");
-            //}
 
             // Check Approval Flow for the Amount
             var approvalFlow = await db.ApprovalFlows

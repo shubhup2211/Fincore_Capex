@@ -1,5 +1,6 @@
 ﻿using Fincore.Application.DTO.Capex;
 using Fincore.Application.Interfaces.ICapex;
+using Fincore.Domain.Enums;
 using Fincore.Infrastructure.Services.Capex;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,9 +20,9 @@ namespace Fincore.API.Controllers.Capex
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetRFQ(int page = 1, int pagesize = 10)
+        public async Task<IActionResult> GetRFQ(int page = 1, int pagesize = 10, IsActive? isActive=null)
         {
-            var response = await rFQService.GetRFQ(page, pagesize);
+            var response = await rFQService.GetRFQ(page, pagesize, isActive);
             return Ok(response);
         }
 
