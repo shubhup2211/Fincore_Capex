@@ -1,109 +1,87 @@
 name: Build and deploy ASP.Net Core app to Azure Web App - fincore-app
 
 on:
-push:
-branches:
-- main
-workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
+  build:
+    runs-on: windows-latest
 
-build:
-runs-on: windows-latest
+    permissions:
+      contents: read
 
-```
-permissions:
-  contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-steps:
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
 
-  - name: Checkout repository
-    uses: actions/checkout@v4
+      - name: Restore dependencies
+        run: dotnet restore ./Fincore.API.sln
 
+      - name: Build application
+        run: dotnet build ./Fincore.API.sln --configuration Release --no-restore
 
-  - name: Set up .NET Core
-    uses: actions/setup-dotnet@v4
-    with:
-      dotnet-version: '8.x'
+      - name: Publish API
+        run: dotnet publish ./Fincore.API/Fincore.API.csproj -c Release --no-build --self-contained false -o ./publish
 
+      - name: Check publish size and largest files
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem ./publish -Recurse -File
+          $size = ($files | Measure-Object -Property Length -Sum).Sum
 
-  - name: Restore dependencies
-    run: dotnet restore ./Fincore.API.sln
+          Write-Host "TOTAL PUBLISH SIZE: $([math]::Round($size / 1MB, 2)) MB"
 
+          $files |
+            Sort-Object Length -Descending |
+            Select-Object -First 30 FullName,
+              @{Name="SizeMB";Expression={[math]::Round($_.Length / 1MB, 2)}} |
+            Format-Table -AutoSize
 
-  - name: Build application
-    run: dotnet build ./Fincore.API.sln --configuration Release --no-restore
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ./publish
 
+  deploy:
+    runs-on: windows-latest
+    needs: build
 
-  - name: Publish API
-    run: dotnet publish ./Fincore.API/Fincore.API.csproj -c Release --no-build --self-contained false -o ./publish
+    permissions:
+      id-token: write
+      contents: read
 
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+          path: ${{ github.workspace }}/publish
 
-  - name: Check publish size and largest files
-    shell: pwsh
-    run: |
-      $files = Get-ChildItem ./publish -Recurse -File
+      - name: Verify downloaded publish files
+        shell: pwsh
+        run: |
+          Get-ChildItem "${{ github.workspace }}/publish" -Recurse
 
-      $size = ($files | Measure-Object -Property Length -Sum).Sum
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_945F908E97AF4013BC4E6617B5CB0CC7 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7A146135AF524DE7AED4BBBAD0CE2B7B }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_38B8B308D7D5403DB39054F82625DA6E }}
 
-      Write-Host "======================================"
-      Write-Host "TOTAL PUBLISH SIZE: $([math]::Round($size / 1MB, 2)) MB"
-      Write-Host "======================================"
-
-      Write-Host "========== TOP 30 LARGEST FILES =========="
-
-      $files |
-        Sort-Object Length -Descending |
-        Select-Object -First 30 FullName,
-          @{Name="SizeMB";Expression={[math]::Round($_.Length / 1MB, 2)}} |
-        Format-Table -AutoSize
-
-
-  - name: Upload artifact for deployment job
-    uses: actions/upload-artifact@v4
-    with:
-      name: .net-app
-      path: ./publish
-```
-
-deploy:
-runs-on: windows-latest
-needs: build
-
-```
-permissions:
-  id-token: write
-  contents: read
-
-steps:
-
-  - name: Download artifact from build job
-    uses: actions/download-artifact@v4
-    with:
-      name: .net-app
-      path: ${{ github.workspace }}/publish
-
-
-  - name: Verify downloaded publish files
-    shell: pwsh
-    run: |
-      Write-Host "========== PUBLISH FOLDER =========="
-      Get-ChildItem "${{ github.workspace }}/publish" -Recurse
-
-
-  - name: Login to Azure
-    uses: azure/login@v2
-    with:
-      client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_945F908E97AF4013BC4E6617B5CB0CC7 }}
-      tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_7A146135AF524DE7AED4BBBAD0CE2B7B }}
-      subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_38B8B308D7D5403DB39054F82625DA6E }}
-
-
-  - name: Deploy to Azure Web App
-    id: deploy-to-webapp
-    uses: azure/webapps-deploy@v3
-    with:
-      app-name: 'fincore-app'
-      slot-name: 'Production'
-      package: ${{ github.workspace }}/publish
-```
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'fincore-app'
+          slot-name: 'Production'
+          package: ${{ github.workspace }}/publish
