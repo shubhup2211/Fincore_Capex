@@ -255,7 +255,7 @@ var app = builder.Build();
 // Configure HTTP Pipeline
 // -------------------------
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || true)
 {
     app.UseSwagger();
     app.UseSwaggerUI();
