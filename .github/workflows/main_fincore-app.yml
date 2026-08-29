@@ -29,8 +29,8 @@ jobs:
         run: dotnet build ./Fincore.API.sln --configuration Release --no-restore
 
       - name: Publish API
-        run: dotnet publish ./Fincore.API/Fincore.API.csproj -c Release --no-build --self-contained false -o ./publish
-
+        run: dotnet publish ./Fincore.API/Fincore.API.csproj -c Release -r win-x64 --self-contained false -o ./publish
+        
       - name: Check publish size and largest files
         shell: pwsh
         run: |
