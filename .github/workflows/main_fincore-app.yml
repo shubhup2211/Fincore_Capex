@@ -1,6 +1,3 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core app to Azure Web App - fincore-app
 
 on:
@@ -12,42 +9,68 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      - name: Restore dependencies
+        run: dotnet restore ./Fincore.API.sln
 
-      - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+      - name: Build application
+        run: dotnet build ./Fincore.API.sln --configuration Release --no-restore
+
+      - name: Publish API
+        run: dotnet publish ./Fincore.API/Fincore.API.csproj -c Release --no-build --self-contained false -o ./publish
+
+      - name: Check publish size and largest files
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem ./publish -Recurse -File
+          $size = ($files | Measure-Object -Property Length -Sum).Sum
+
+          Write-Host "TOTAL PUBLISH SIZE: $([math]::Round($size / 1MB, 2)) MB"
+
+          $files |
+            Sort-Object Length -Descending |
+            Select-Object -First 30 FullName,
+              @{Name="SizeMB";Expression={[math]::Round($_.Length / 1MB, 2)}} |
+            Format-Table -AutoSize
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./publish
 
   deploy:
     runs-on: windows-latest
     needs: build
+
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-      
+          path: ${{ github.workspace }}/publish
+
+      - name: Verify downloaded publish files
+        shell: pwsh
+        run: |
+          Get-ChildItem "${{ github.workspace }}/publish" -Recurse
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -61,5 +84,4 @@ jobs:
         with:
           app-name: 'fincore-app'
           slot-name: 'Production'
-          package: .
-          
+          package: ${{ github.workspace }}/publish
