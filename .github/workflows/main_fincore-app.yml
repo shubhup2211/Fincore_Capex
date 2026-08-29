@@ -12,8 +12,9 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -23,31 +24,42 @@ jobs:
         with:
           dotnet-version: '8.x'
 
+      - name: Restore dependencies
+        run: dotnet restore
+
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build --configuration Release --no-restore
 
-      - name: dotnet publish
-        run: dotnet publish -c Release --self-contained false -o "${{env.DOTNET_ROOT}}/myapp"
+      - name: Publish application
+        run: dotnet publish -c Release --no-build --self-contained false -o publish
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: publish
+
 
   deploy:
     runs-on: windows-latest
     needs: build
+
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: .net-app
-      
+          path: ${{ github.workspace }}/publish
+
+      - name: Verify publish folder
+        shell: pwsh
+        run: |
+          Get-ChildItem "${{ github.workspace }}/publish"
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -56,10 +68,8 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_38B8B308D7D5403DB39054F82625DA6E }}
 
       - name: Deploy to Azure Web App
-        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'fincore-app'
           slot-name: 'Production'
-          package: './publish'
-          
+          package: ${{ github.workspace }}/publish
