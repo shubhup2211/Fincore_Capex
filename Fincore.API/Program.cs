@@ -255,13 +255,12 @@ var app = builder.Build();
 // Configure HTTP Pipeline
 // -------------------------
 
-if (app.Environment.IsDevelopment() || true)
-{
+
     app.UseSwagger();
     app.UseSwaggerUI();
-}
 
-await DatabaseSeeder.SeedAsync(app.Services);
+
+//await DatabaseSeeder.SeedAsync(app.Services);
 app.UseHttpsRedirection();
 
 app.UseRateLimiter();
