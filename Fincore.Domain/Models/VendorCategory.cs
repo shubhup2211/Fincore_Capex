@@ -38,6 +38,7 @@ namespace Fincore.Domain.Models
 
         // Navigation Properties
         public List<Vendor> Vendors { get; set; }
-        public List<PurchaseRequisitionItem> PurchaseRequisitionItems { get; set; }
+        public List<PurchaseRequisition> PurchaseRequisitions { get; set; }
+        public List<BudgetLine> BudgetLines { get; set; }
     }
 }

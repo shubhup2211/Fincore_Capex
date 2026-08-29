@@ -15,24 +15,33 @@ namespace Fincore.Domain.Models
 
         [Required]
         [StringLength(30)]
+        public string CapexReqNumber { get; set; }
+
+        [Required]
+        [StringLength(30)]
         public string Title { get; set; }
 
         [Required]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal Amount { get; set; }
 
         [Required]
-        [ForeignKey("Department")]
-        public int DepartmentId { get; set; }
-        public Department Department { get; set; }
-
-        [Required]
         [ForeignKey("BudgetLine")]
         public int BudgetLineId { get; set; }
         public BudgetLine BudgetLine { get; set; }
+
+        [Required]
+        [ForeignKey("RequiredRole")]
+        public int RequiredRoleId { get; set; }
+        public ApprovalFlow RequiredRole { get; set; }
+
+        [Required]
+        [ForeignKey("Approver")]
+        public int ApproverId { get; set; }
+        public User Approver { get; set; }
 
         [Required]
         [ForeignKey("RequestedByUser")]
@@ -41,14 +50,14 @@ namespace Fincore.Domain.Models
 
         [Required]
         [StringLength(15)]
-        public string ApprovalStatus { get; set; }
+        public string? ApprovalStatus { get; set; }
 
         [ForeignKey("ApprovedByUser")]
         public int? ApprovedBy { get; set; }
         public User ApprovedByUser { get; set; }
 
         public DateTime? ApprovedAt { get; set; }
-        public DateTime? CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
 
         // Navigation Properties

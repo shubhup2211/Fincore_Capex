@@ -70,12 +70,14 @@ namespace Fincore.Infrastructure.Seed.Procurement
         private static async Task SeedCapexRequestsAsync(AppDbContext db)
         {
             if (await db.CapexRequests.AnyAsync()) return;
-            var depts = await db.Departments.OrderBy(d => d.DepartmentId).ToListAsync();
             var lines = await db.BudgetLines.OrderBy(b => b.BudgetLineId).ToListAsync();
             var users = await db.Users.Where(u => u.UserCategory == "Employee").ToListAsync();
+            var approvalFlows = await db.ApprovalFlows.OrderBy(a => a.MinAmount).ToListAsync();
             var admin = RoleSeeder.BootstrapUserId;
             var now = DateTime.UtcNow;
             var rng = new Randomizer(FakerHelper.GlobalSeed + 8);
+            var roles = await db.Roles.ToListAsync();
+            int financeRole = roles.First(r => r.RoleName == "Finance Manager").RoleId;
             string[] statuses = { "Approved", "Approved", "Pending", "Rejected" };
 
             var list = new List<CapexRequest>();
@@ -84,10 +86,12 @@ namespace Fincore.Infrastructure.Seed.Procurement
                 var s = statuses[i % statuses.Length];
                 list.Add(new CapexRequest
                 {
+                    CapexReqNumber = $"CAPEX-{DateTime.UtcNow.Year}-{i + 1:D4}",
                     Title            = $"Capex Item {i + 1:D2}",
                     Description      = $"Capital expense for infrastructure/asset acquisition #{i + 1}",
                     Amount           = System.Math.Round((decimal)rng.Double(50000, 4500000), 2),
-                    DepartmentId     = depts[i % depts.Count].DepartmentId,
+                    RequiredRoleId = financeRole,
+                    ApproverId = 1,   
                     BudgetLineId     = lines[i % lines.Count].BudgetLineId,
                     RequestedBy      = users[i % users.Count].UserId,
                     ApprovalStatus   = s,
@@ -109,6 +113,12 @@ namespace Fincore.Infrastructure.Seed.Procurement
             var admin = RoleSeeder.BootstrapUserId;
             var now = DateTime.UtcNow;
             var rng = new Randomizer(FakerHelper.GlobalSeed + 9);
+            var categories = await db.VendorCategories
+                         .OrderBy(x => x.VendorCategoryId)
+                         .ToListAsync();
+
+            var roles = await db.Roles.ToListAsync();
+            int procurementRole = roles.First(r => r.RoleName == "Procurement Head").RoleId;
             string[] statuses = { "Approved", "Approved", "Pending", "Rejected", "InReview" };
 
             var list = new List<PurchaseRequisition>();
@@ -121,6 +131,9 @@ namespace Fincore.Infrastructure.Seed.Procurement
                     PRNumber          = $"PR-{DateTime.UtcNow.Year}-{i + 1:D4}",
                     CapexRequestId    = c.CapexRequestId,
                     PRTitle           = $"Requisition for {c.Title}",
+                    Amount = Math.Round((decimal)rng.Double(25000, 800000), 2),
+                    CategoryId = categories[rng.Int(0, categories.Count - 1)].VendorCategoryId,
+                    RequiredRoleId = procurementRole,
                     RequestedBy       = users[i % users.Count].UserId,
                     RequiredTillDate  = now.AddDays(rng.Int(15, 90)),
                     ApprovalStatus    = s,
@@ -154,22 +167,16 @@ namespace Fincore.Infrastructure.Seed.Procurement
                 {
                     var qty  = rng.Int(1, 25);
                     var unit = System.Math.Round((decimal)rng.Double(100, 15000), 2);
-                    var tax  = 18m;
-                    var taxAmt = System.Math.Round(qty * unit * tax / 100, 2);
-                    var line = System.Math.Round((unit * qty) + taxAmt, 2);
+                    var line = System.Math.Round((unit * qty), 2);
                     list.Add(new PurchaseRequisitionItem
                     {
                         PurchaseRequisitionId = pr.PurchaseRequisitionId,
                         ItemName              = items[rng.Int(0, items.Length - 1)],
                         ItemDescription       = "Auto-generated item description for procurement seed data.",
-                        CategoryId            = cats[rng.Int(0, cats.Count - 1)].VendorCategoryId,
                         Quantity              = qty,
                         UnitOfMaterial        = units[rng.Int(0, units.Length - 1)],
                         EstimatedUnitPrice    = unit,
-                        TaxPercentage         = tax,
-                        TaxAmount             = taxAmt,
-                        LineTotal             = line,
-                        ItemStatus            = statuses[rng.Int(0, statuses.Length - 1)]
+                        LineTotal             = line
                     });
                 }
             }
@@ -184,6 +191,7 @@ namespace Fincore.Infrastructure.Seed.Procurement
             var employees = await db.Employees.OrderBy(e => e.EmployeeId).ToListAsync();
             var now = DateTime.UtcNow;
             var rng = new Randomizer(FakerHelper.GlobalSeed + 11);
+            var admin = RoleSeeder.BootstrapUserId;
 
             var list = new List<RFQ>();
             for (int i = 0; i < 20; i++)
@@ -196,12 +204,12 @@ namespace Fincore.Infrastructure.Seed.Procurement
                     PurchaseRequisitionId  = pr.PurchaseRequisitionId,
                     Title                  = $"RFQ #{i + 1} – {pr.PRTitle.Substring(0, System.Math.Min(15, pr.PRTitle.Length))}",
                     Description            = "Request for quotation issued to shortlisted vendors.",
-                    IssueDate              = issue,
                     LastDate               = issue.AddDays(15),
                     IsActive               = 1,
                     CreatedBy              = employees[i % employees.Count].EmployeeId,
                     CreatedAt              = issue,
-                    ModifiedAt             = now
+                    ModifiedAt             = now,
+                    ModifiedBy              = admin
                 });
             }
             db.RFQs.AddRange(list);
@@ -226,7 +234,6 @@ namespace Fincore.Infrastructure.Seed.Procurement
                     {
                         RFQId          = rfq.RFQId,
                         VendorId       = v.VendorId,
-                        InvitedAt      = rfq.IssueDate,
                         ResponseStatus = statuses[rng.Int(0, statuses.Length - 1)]
                     });
                 }
@@ -259,7 +266,7 @@ namespace Fincore.Infrastructure.Seed.Procurement
                         QuotedAmount    = System.Math.Round((decimal)rng.Double(30000, 900000), 2),
                         Remarks         = k == 0 ? "Standard terms – 30 day payment" : "Premium offer – includes 12mo AMC",
                         IsSelected      = (byte)(k == 0 ? 1 : 0),
-                        CreatedAt       = rfq.IssueDate?.AddDays(3),
+                        CreatedAt       = rfq.CreatedAt.AddDays(3),
                         ModifiedAt      = now
                     });
                 }
@@ -292,7 +299,7 @@ namespace Fincore.Infrastructure.Seed.Procurement
                         PRItemId       = pri.PRItemId,
                         Quantity       = qty,
                         UnitPrice      = unit,
-                        TaxPercentage  = pri.TaxPercentage,
+                        TaxPercentage  = 18,
                         Discount       = disc,
                         LineTotal      = line
                     });
@@ -345,12 +352,12 @@ namespace Fincore.Infrastructure.Seed.Procurement
                     POCode                 = $"PO-{DateTime.UtcNow.Year}-{i:D4}",
                     PurchaseRequisitionId  = sel.RFQ != null ? sel.RFQ.PurchaseRequisitionId : (int?)null,
                     QuotationId            = sel.QuotationId,
-                    VendorId = sel.SelectedVendorId,
+                    VendorId = sel.SelectedVendorId ?? 0,
                     RequestedBy            = admin,
                     RequiredTillDate       = now.AddDays(rng.Int(15, 90)),
                     OrderDate              = now.AddDays(-rng.Int(5, 45)),
                     ApprovalStatus         = s,
-                    Amount                 = sel.Quotation.QuotedAmount,
+                    Amount                 = sel.Quotation.QuotedAmount ?? 0,
                     ApprovedBy             = s == "Approved" || s == "Delivered" ? admin : (int?)null,
                     IsActive               = 1,
                     ApprovedAt             = s == "Approved" || s == "Delivered" ? now.AddDays(-rng.Int(1, 20)) : (DateTime?)null,
@@ -382,7 +389,7 @@ namespace Fincore.Infrastructure.Seed.Procurement
                 {
                     var unit    = System.Math.Round((pri.EstimatedUnitPrice ?? 100m), 2);
                     var qty     = pri.Quantity;
-                    var taxPct  = pri.TaxPercentage;
+                    var taxPct  = 18;
                     var taxAmt  = System.Math.Round(unit * qty * taxPct / 100, 2);
                     list.Add(new PurchaseOrderItem
                     {

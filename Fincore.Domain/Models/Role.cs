@@ -43,5 +43,7 @@ namespace Fincore.Domain.Models
         public List<User> Users { get; set; }
         public List<Permission> Permissions { get; set; }
         public List<ApprovalFlow> ApprovalFlows { get; set; }
+
+        public List<PurchaseRequisition> PurchaseRequisitions { get; set; }
     }
 }

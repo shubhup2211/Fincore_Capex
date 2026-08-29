@@ -443,10 +443,15 @@ namespace Fincore.Infrastructure.Data
                     .HasForeignKey(e => e.BudgetId)
                     .OnDelete(DeleteBehavior.Restrict);
 
-                entity.HasOne(e => e.BudgetCategory)
-                    .WithMany(bc => bc.BudgetLines)
-                    .HasForeignKey(e => e.BudgetCategoryId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.VendorCategory)
+      .WithMany(v => v.BudgetLines)
+      .HasForeignKey(e => e.VendorCategoryId)
+      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Department)
+                      .WithMany(d => d.BudgetLines)
+                      .HasForeignKey(e => e.DepartmentId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(e => e.CreatedByUser)
                     .WithMany(u => u.BudgetLinesCreated)
@@ -485,10 +490,10 @@ namespace Fincore.Infrastructure.Data
             {
                 entity.HasKey(e => e.CapexRequestId);
 
-                entity.HasOne(e => e.Department)
-                    .WithMany(d => d.CapexRequests)
-                    .HasForeignKey(e => e.DepartmentId)
-                    .OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.RequiredRole)
+      .WithMany(r => r.CapexRequests)
+      .HasForeignKey(e => e.RequiredRoleId)
+      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(e => e.BudgetLine)
                     .WithMany(bl => bl.CapexRequests)
@@ -504,6 +509,11 @@ namespace Fincore.Infrastructure.Data
                     .WithMany(u => u.CapexRequestsApproved)
                     .HasForeignKey(e => e.ApprovedBy)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Approver)
+    .WithMany(u => u.CapexApprovals)
+    .HasForeignKey(e => e.ApproverId)
+    .OnDelete(DeleteBehavior.Restrict);
             });
 
             // PurchaseRequisition Configuration
@@ -517,6 +527,16 @@ namespace Fincore.Infrastructure.Data
                     .WithMany()
                     .HasForeignKey(e => e.CapexRequestId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.VendorCategory)
+      .WithMany(v => v.PurchaseRequisitions)
+      .HasForeignKey(e => e.CategoryId)
+      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.RequiredRole)
+                      .WithMany(r => r.PurchaseRequisitions)
+                      .HasForeignKey(e => e.RequiredRoleId)
+                      .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(e => e.RequestedByUser)
                     .WithMany(u => u.PurchaseRequisitionsRequested)
@@ -548,11 +568,6 @@ namespace Fincore.Infrastructure.Data
                     .WithMany(pr => pr.PurchaseRequisitionItems)
                     .HasForeignKey(e => e.PurchaseRequisitionId)
                     .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne(e => e.VendorCategory)
-                    .WithMany(vc => vc.PurchaseRequisitionItems)
-                    .HasForeignKey(e => e.CategoryId)
-                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             // RFQ Configuration
@@ -571,6 +586,11 @@ namespace Fincore.Infrastructure.Data
                     .WithMany(em => em.RFQsCreated)
                     .HasForeignKey(e => e.CreatedBy)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ModifiedByEmployee)
+      .WithMany(u => u.RFQsModified)
+      .HasForeignKey(e => e.ModifiedBy)
+      .OnDelete(DeleteBehavior.Restrict);
             });
 
             // RFQVendor Configuration

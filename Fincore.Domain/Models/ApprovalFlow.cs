@@ -42,5 +42,7 @@ namespace Fincore.Domain.Models
         [ForeignKey("ModifiedByUser")]
         public int ModifiedBy { get; set; }
         public User ModifiedByUser { get; set; }
+
+        public List<CapexRequest> CapexRequests { get; set; }
     }
 }

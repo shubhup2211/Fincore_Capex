@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Fincore.Application.DTO.Capex;
+using Fincore.Application.DTO.Login;
+using Fincore.Application.DTO.MasterTable;
 using Fincore.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -17,7 +19,10 @@ namespace Fincore.Application.AutoMapper.Capex
             CreateMap<CapexRequest, CapexReqDTOPost>().ReverseMap();
             CreateMap<CapexReqDTOPost, CapexRequest>()
               .ForMember(dest => dest.CapexRequestId, opt => opt.Ignore());
-            CreateMap<CapexRequest, CapexReqDTOGet>();
+
+            CreateMap<CapexRequest, CapexReqDTOGet>()
+                              .ForMember(x => x.ApprovedBy, x => x.MapFrom(x => x.ApprovedByUser.FullName))
+                              .ForMember(x => x.RequestedBy, x => x.MapFrom(x => x.RequestedByUser.FullName));
 
             //PR 
             CreateMap<PurchaseRequisition, PRDTOPost>().ReverseMap();
@@ -34,8 +39,7 @@ namespace Fincore.Application.AutoMapper.Capex
             CreateMap<PRItemDTOPost, PurchaseRequisitionItem>()
               .ForMember(dest => dest.PRItemId, opt => opt.Ignore());
             CreateMap<PurchaseRequisitionItem, PRItemDTOGet>()
-                .ForMember(x => x.PRName, x => x.MapFrom(x => x.PurchaseRequisition.PRTitle != null ? x.PurchaseRequisition.PRTitle : "Not Available"))
-                .ForMember(x => x.Category, x => x.MapFrom(x => x.VendorCategory.CategoryName != null ? x.VendorCategory.CategoryName : "Not Available"));
+                .ForMember(x => x.PRName, x => x.MapFrom(x => x.PurchaseRequisition.PRTitle != null ? x.PurchaseRequisition.PRTitle : "Not Available"));
 
             //RFQ
             CreateMap<RFQ, RFQDTOPost>().ReverseMap();
@@ -87,7 +91,10 @@ namespace Fincore.Application.AutoMapper.Capex
             CreateMap<ApprovalFlow, ApprovalFlowDTOGet>()                
                 .ForMember(x => x.RequiredRole, x => x.MapFrom(x => x.RequiredRole.RoleName != null ? x.RequiredRole.RoleName : "Not Available"));
 
-
+            //Login
+            CreateMap<UserDto, UserDTOLogin>().ReverseMap();
+            CreateMap<User, UserDTOGet>()
+                .ForMember(x => x.UserName, x => x.MapFrom(x => x.FullName != null ? x.FullName : "Not Available"));
         }
     }
 }

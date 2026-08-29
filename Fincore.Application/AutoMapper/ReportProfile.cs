@@ -22,7 +22,7 @@ namespace Fincore.Application.AutoMapper
             CreateMap<ExpenseClaim, ExpenseReportDTO>()
             .ForMember(dest => dest.OpexTitle,opt => opt.MapFrom(src => src.OpexRequest.Title))
             .ForMember(dest => dest.ClaimedBy,opt => opt.MapFrom(src => src.ClaimByUser.FullName))
-            .ForMember(dest => dest.Department,opt => opt.MapFrom(src => src.OpexRequest.BudgetLine.BudgetCategory.Department.DepartmentName));
+            .ForMember(dest => dest.Department,opt => opt.MapFrom(src => src.OpexRequest.BudgetLine.Department.DepartmentName));
 
             // Vendpr
             CreateMap<APInvoice, VendorSpendDTO>()
@@ -43,7 +43,6 @@ namespace Fincore.Application.AutoMapper
 
             //Capex
             CreateMap<CapexRequest, CapexReportDTO>()
-           .ForMember(dest => dest.DepartmentName,opt => opt.MapFrom(src => src.Department.DepartmentName))
            .ForMember(dest => dest.RequestedBy,opt => opt.MapFrom(src => src.RequestedByUser.FullName))
            .ForMember(dest => dest.BudgetAllocated,opt => opt.MapFrom(src => src.BudgetLine.AllocatedAmount))
            .ForMember(dest => dest.BudgetUtilized,opt => opt.MapFrom(src => src.BudgetLine.UtilizedAmount));
@@ -62,8 +61,6 @@ namespace Fincore.Application.AutoMapper
                 .ForMember(dest => dest.BudgetName, opt => opt.MapFrom(src => src.Budget.BudgetName))
                 .ForMember(dest => dest.FinancialYear,opt => opt.MapFrom(src => src.Budget.FinancialYear))
                 .ForMember(dest => dest.BudgetAmount,opt => opt.MapFrom(src => src.Budget.BudgetAmount))
-                .ForMember(dest => dest.CategoryName,opt => opt.MapFrom(src => src.BudgetCategory.CategoryName))
-                .ForMember(dest => dest.DepartmentName,opt => opt.MapFrom(src => src.BudgetCategory.Department.DepartmentName))
                 .ForMember(dest => dest.UtilizedAmount,opt => opt.MapFrom(src => src.UtilizedAmount.GetValueOrDefault()))
                 .ForMember(dest => dest.RemainingAmount, opt => opt.MapFrom(src => src.AllocatedAmount - (src.UtilizedAmount.GetValueOrDefault())));
 

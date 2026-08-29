@@ -23,10 +23,8 @@ namespace Fincore.Domain.Models
         public int VendorId { get; set; }
         public Vendor Vendor { get; set; }
 
-        public DateTime? InvitedAt { get; set; }
-
         [Required]
         [StringLength(20)]
-        public string ResponseStatus { get; set; }
+        public string? ResponseStatus { get; set; }
     }
 }

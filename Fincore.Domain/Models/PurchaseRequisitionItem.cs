@@ -23,12 +23,7 @@ namespace Fincore.Domain.Models
         public string ItemName { get; set; }
 
         [StringLength(500)]
-        public string ItemDescription { get; set; }
-
-        [Required]
-        [ForeignKey("VendorCategory")]
-        public int CategoryId { get; set; }
-        public VendorCategory VendorCategory { get; set; }
+        public string? ItemDescription { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
@@ -41,19 +36,9 @@ namespace Fincore.Domain.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal? EstimatedUnitPrice { get; set; }
 
-        [Column(TypeName = "decimal(5,2)")]
-        public decimal TaxPercentage { get; set; }
-
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal TaxAmount { get; set; }
-
         [Required]
         [Column(TypeName = "decimal(18,2)")]
-        public decimal LineTotal { get; set; }
-
-        [Required]
-        [StringLength(10)]
-        public string ItemStatus { get; set; }
+        public decimal? LineTotal { get; set; }
 
         // Navigation Properties
         public List<QuotationItem> QuotationItems { get; set; }

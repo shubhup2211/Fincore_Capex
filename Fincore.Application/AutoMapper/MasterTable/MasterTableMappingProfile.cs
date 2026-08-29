@@ -393,12 +393,6 @@ namespace Fincore.Application.AutoMapper.MasterTable
                 .ForMember(dest => dest.ModifiedByUser,
                     opt => opt.Ignore())
 
-                .ForMember(dest => dest.PurchaseRequisitions,
-                    opt => opt.Ignore())
-
-                .ForMember(dest => dest.RFQs,
-                    opt => opt.Ignore())
-
                 .ForMember(dest => dest.RFQVendors,
                     opt => opt.Ignore())
 
@@ -447,12 +441,6 @@ namespace Fincore.Application.AutoMapper.MasterTable
                     opt => opt.Ignore())
 
                 .ForMember(dest => dest.ModifiedByUser,
-                    opt => opt.Ignore())
-
-                .ForMember(dest => dest.PurchaseRequisitions,
-                    opt => opt.Ignore())
-
-                .ForMember(dest => dest.RFQs,
                     opt => opt.Ignore())
 
                 .ForMember(dest => dest.RFQVendors,

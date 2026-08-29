@@ -27,19 +27,21 @@ namespace Fincore.Domain.Models
         public string Title { get; set; }
 
         [StringLength(255)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
+        public DateTime LastDate { get; set; }
 
-        public DateTime? IssueDate { get; set; }
-        public DateTime? LastDate { get; set; }
-
-        public byte? IsActive { get; set; }
+        public byte IsActive { get; set; }
 
         [Required]
         [ForeignKey("CreatedByEmployee")]
         public int CreatedBy { get; set; }
         public Employee CreatedByEmployee { get; set; }
 
-        public DateTime? CreatedAt { get; set; }
+        [ForeignKey("ModifiedByEmployee")]
+        public int? ModifiedBy { get; set; }
+        public Employee ModifiedByEmployee { get; set; }
+
+        public DateTime CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }
 
         // Navigation Properties

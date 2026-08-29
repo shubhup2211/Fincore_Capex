@@ -262,7 +262,7 @@ namespace Fincore.Infrastructure.Services.Capex
             }
 
             //Get Category Ids
-            var categoryIds = prItems
+            var categoryIds = db.PurchaseRequisitions
                 .Select(x => x.CategoryId )
                 .Distinct()
                 .ToList();
@@ -286,7 +286,6 @@ namespace Fincore.Infrastructure.Services.Capex
                 {
                     RFQId = rfq.RFQId,
                     VendorId = vendor.VendorId,
-                    InvitedAt = DateTime.Now,
                     ResponseStatus = "Pending"
                 };
 

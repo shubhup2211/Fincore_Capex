@@ -19,9 +19,14 @@ namespace Fincore.Domain.Models
         public Budget Budget { get; set; }
 
         [Required]
-        [ForeignKey("BudgetCategory")]
-        public int BudgetCategoryId { get; set; }
-        public BudgetCategory BudgetCategory { get; set; }
+        [ForeignKey("VendorCategory")]
+        public int VendorCategoryId { get; set; }
+        public VendorCategory VendorCategory { get; set; }
+
+        [Required]
+        [ForeignKey("Department")]
+        public int DepartmentId { get; set; }
+        public Department Department { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
@@ -29,6 +34,9 @@ namespace Fincore.Domain.Models
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal? UtilizedAmount { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? RemainingAmount { get; set; }
 
         [Required]
         public byte IsActive { get; set; }

@@ -63,7 +63,9 @@ namespace Fincore.Domain.Models
         public int ModifiedBy { get; set; }
         public User ModifiedByUser { get; set; }
 
+
         // Navigation Properties
+        public List<CapexRequest> CapexApprovals { get; set; }
         public List<Company> CompaniesCreated { get; set; }
         public List<Company> CompaniesModified { get; set; }
         public List<Department> DepartmentsCreated { get; set; }

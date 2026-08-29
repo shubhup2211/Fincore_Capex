@@ -32,8 +32,8 @@ namespace Fincore.Infrastructure.Services.Capex
         {
 
             var add = map.Map<PurchaseRequisitionItem>(pr);
-            add.TaxAmount = CalculateTaxAmount(add.Quantity, add.EstimatedUnitPrice.Value, add.TaxPercentage);
-            add.LineTotal = CalculateLineTotal(add.Quantity, add.EstimatedUnitPrice.Value, add.TaxAmount);
+            //add.TaxAmount = CalculateTaxAmount(add.Quantity, add.EstimatedUnitPrice.Value, add.TaxPercentage);
+            add.LineTotal = CalculateLineTotal(add.Quantity, add.EstimatedUnitPrice.Value);
 
             await db.PurchaseRequisitionItems.AddAsync(add);
             var result = await db.SaveChangesAsync();
@@ -62,11 +62,11 @@ namespace Fincore.Infrastructure.Services.Capex
 
             }
 
-            if (pr.ItemStatus == "Cancelled")
-            {
-                return ApiResponseHelper.Failure<string>(
-                                                   "Purchase Requistion Item already Deleted", "ALREADY_DELETED", $"Purchase Requistion Item with id {id} has already been deleted");
-            }
+            //if (pr.ItemStatus == "Cancelled")
+            //{
+            //    return ApiResponseHelper.Failure<string>(
+            //                                       "Purchase Requistion Item already Deleted", "ALREADY_DELETED", $"Purchase Requistion Item with id {id} has already been deleted");
+            //}
 
             bool hasQuotation = await db.QuotationItems.AnyAsync(x=> x.PurchaseRequisitionItem.PRItemId == id);
             if (hasQuotation) 
@@ -75,8 +75,7 @@ namespace Fincore.Infrastructure.Services.Capex
                                   "Cannot Delete Purchase Requistion Item", "DELETE_RESTRICTED", $"Purchase Requistion Item with id {id} cannot be deleted because its linked to Quotation Item");
 
             }
-
-            pr.ItemStatus = "Cancelled";
+;
             await db.SaveChangesAsync();
 
             return ApiResponseHelper.SuccessRes($"Purchase Requistion Item Deleted Successfully with id {id}");
@@ -106,7 +105,6 @@ namespace Fincore.Infrastructure.Services.Capex
             }
 
             PRlist = await db.PurchaseRequisitionItems
-                .Where(x=> x.ItemStatus != "Cancelled")
                 .Skip((page - 1) * pagesize).Take(pagesize)
                 .ProjectTo<PRItemDTOGet>(map.ConfigurationProvider)
                 .ToListAsync();
@@ -135,7 +133,7 @@ namespace Fincore.Infrastructure.Services.Capex
             }
 
             pr = await db.PurchaseRequisitionItems
-                .Where(x => x.PRItemId == id && x.ItemStatus != "Cancelled")
+                .Where(x => x.PRItemId == id )
                 .ProjectTo<PRItemDTOGet>(map.ConfigurationProvider)
                 .FirstOrDefaultAsync();
 
@@ -151,24 +149,15 @@ namespace Fincore.Infrastructure.Services.Capex
 
         public async Task<ApiResponse<string>> UpdatePRItem(int id, PRItemDTOPost pr)
         {
-            var update = await db.PurchaseRequisitionItems.FirstOrDefaultAsync(x => x.PRItemId == id && x.ItemStatus != "Cancelled");
+            var update = await db.PurchaseRequisitionItems.FirstOrDefaultAsync(x => x.PRItemId == id );
 
             if (update == null)
             {
                 return ApiResponseHelper.Failure<string>(
                     "Purchase Requistion Item Not Found", "NOT_FOUND", $"Purchase Requistion Item with id {id} Not found");
             }
-
-            if (update.ItemStatus != "Open")
-            {
-                return ApiResponseHelper.Failure<string>(
-                    "Cannot Update Item",
-                    "INVALID_STATUS",
-                    "Items can only be updated when the Purchase Requisition Item is in Open status.");
-            }
-
-            update.TaxAmount = CalculateTaxAmount(update.Quantity, update.EstimatedUnitPrice.Value, update.TaxPercentage);
-            update.LineTotal = CalculateLineTotal(update.Quantity, update.EstimatedUnitPrice.Value, update.TaxAmount);
+            
+            update.LineTotal = CalculateLineTotal(update.Quantity, update.EstimatedUnitPrice.Value);
 
             map.Map(pr, update);
             await db.SaveChangesAsync();
@@ -185,9 +174,9 @@ namespace Fincore.Infrastructure.Services.Capex
             return (quantity * estimatedUnitPrice * taxPercentage) / 100;
         }
 
-        private decimal CalculateLineTotal(decimal quantity, decimal estimatedUnitPrice, decimal taxAmount)
+        private decimal CalculateLineTotal(decimal quantity, decimal estimatedUnitPrice)
         {
-            return (quantity * estimatedUnitPrice) + taxAmount;
+            return (quantity * estimatedUnitPrice);
         }
 
     }

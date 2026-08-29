@@ -7,10 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Capex\" />
+    <Compile Remove="Services\Logs\**" />
+    <EmbeddedResource Remove="Services\Logs\**" />
+    <None Remove="Services\Logs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Services\Budget\" />
-    <Folder Include="Services\Logs\" />
-    <Folder Include="Services\Opex\" />
   </ItemGroup>
 
   <ItemGroup>

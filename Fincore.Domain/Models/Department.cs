@@ -52,9 +52,10 @@ namespace Fincore.Domain.Models
 
         // Navigation Properties
         public List<Employee> Employees { get; set; }
-        public List<CapexRequest> CapexRequests { get; set; }
         public List<Asset> Assets { get; set; }
         public List<BudgetCategory> BudgetCategories { get; set; }
         public List<RevenueEntry> RevenueEntries { get; set; }
+
+        public List<BudgetLine> BudgetLines { get; set; }
     }
 }

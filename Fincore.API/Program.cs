@@ -1,11 +1,8 @@
 using Fincore.Application.AutoMapper;
-using Fincore.Application.Interfaces.Opex;
 using Fincore.Application.AutoMapper.MasterTable;
 using Fincore.Application.Interfaces.IMasterTable;
-using Fincore.Application.Interfaces.IPayment;
 using Fincore.Application.AutoMapper.MasterTable;
 using Fincore.Application.Interfaces.IMasterTable;
-using Fincore.Application.Interfaces.IPayment;
 
 using Fincore.Application.AutoMapper.Capex;
 using Fincore.Application.Interfaces.ICapex;
@@ -19,9 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Fincore.Infrastructure.Services.Capex;
 
 using Fincore.Infrastructure.Services.MasterTable;
-using Fincore.Infrastructure.Services.PaymentModule;
 
-using Fincore.Infrastructure.Services.Opex;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,10 +33,7 @@ using Fincore.Infrastructure;
 using Fincore.Application.AutoMapper.Capex;
 using Fincore.Application.Interfaces.ICapex;
 using Fincore.Infrastructure.Services.Capex;
-using Fincore.Application.Interfaces.ExpenseClaim;
-using Fincore.Infrastructure.Services.ExpenseClaim;
-using Fincore.Application.Interfaces.WorkOrder;
-using Fincore.Infrastructure.Services.WorkOrder;
+
 using Fincore.Application.Interfaces.BudgetCategory;
 using Fincore.Infrastructure.Services.BudgetCategory;
 using Fincore.Application.Interfaces.Budget;
@@ -49,12 +41,10 @@ using Fincore.Infrastructure.Services.Budget;
 using Fincore.Application.Interfaces.BudgetLine;
 using Fincore.Infrastructure.Services.BudgetLine;
 using Fincore.Application.Mapping;
-using Fincore.Application.Interfaces.Dashboard;
-using Fincore.Infrastructure.Services.Dashboard;
 using Fincore.Application.AutoMapper.Payment;
 using Fincore.Application.Mapper;
-using Fincore.Application.Interfaces.Payment;
-using Fincore.Infrastructure.Services.Payment;
+using Fincore.Application.Interfaces.ICapex2;
+using Fincore.Infrastructure.Services.Capex2;
 
 
 
@@ -104,14 +94,8 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddScoped<ICityService, CityService>();
-builder.Services.AddScoped<ICountryService, CountryService>();
-builder.Services.AddScoped<IStateService, StateService>();
-builder.Services.AddScoped<ICurrencyService, CurrencyService>();
-builder.Services.AddScoped<IAuditLogService, AuditLogService>();
+
 builder.Services.AddScoped<IUserActivityLogService, UserActivityLogService>();
-builder.Services.AddScoped<INotificationLogService, NotificationLogService>();
-builder.Services.AddScoped<IApprovalLogService, ApprovalLogService>();
 builder.Services.AddAutoMapper(typeof(LogsMappingProfile));
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -121,10 +105,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddAutoMapper(typeof(MapperConfigPayment));
 builder.Services.AddAutoMapper(typeof(APInvoiceProfile));
+builder.Services.AddAutoMapper(typeof(CapexAutoMapper));
 
 
-builder.Services.AddScoped<IRevenueService, RevenueService>();
-builder.Services.AddScoped<IAPInvoiceService, APInvoiceService>();
+
+
 //builder.Services.AddScoped<IARInvoiceService, ARInvoiceService>();
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>();
@@ -135,9 +120,6 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // ---------------------- Services ----------------------
 builder.Services.AddScoped<IAccountMasterService, AccountMasterService>();
-
-builder.Services.AddScoped<IPaymentService, PaymentService>();
-builder.Services.AddScoped<IJournalEntryService, JournalEntryService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtTokenHelper, JwtTokenHelper>();
@@ -166,12 +148,26 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<IDocumentService, DocumentService>();
 builder.Services.AddScoped<IDocumentTypeService,DocumentTypeService>();
-builder.Services.AddScoped<IExecutiveService, ExecutiveService>();
-builder.Services.AddScoped<IFinanceService, FinanceService>();
-builder.Services.AddScoped<IProcurementService, ProcurementService>();
 
 builder.Services.AddScoped<IMasterType, MasterTypeService>();
 builder.Services.AddAutoMapper(typeof(DocumentMappingProfile));
+
+builder.Services.AddScoped<ICapexService, CapexService>();
+builder.Services.AddScoped<IPRService2, PRService2>();
+builder.Services.AddScoped<IPRItemService2, PRItemService2>();
+
+builder.Services.AddDistributedMemoryCache();
+
+builder.Services.AddSession(x =>
+{
+    x.IdleTimeout = TimeSpan.FromMinutes(30);
+    x.Cookie.HttpOnly = true;
+    x.Cookie.IsEssential = true;
+    x.Cookie.SameSite = SameSiteMode.None;
+    x.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<Fincore.Infrastructure.CommonHelper.LoginUser>();
 
 builder.Services.AddMemoryCache();
 
@@ -217,12 +213,8 @@ builder.Services.AddScoped<IQuotationService, QuotationService>();
 builder.Services.AddScoped<IQuotationItemService, QuotationItemService>();
 builder.Services.AddScoped<IVendorSelectionService, VendorSelectionService>();
 builder.Services.AddScoped<IApprovalFlowService, ApprovalFlowService>();
-builder.Services.AddScoped<IOpexRequestService, OpexRequestService>();
-builder.Services.AddScoped<IExpenseClaimService, ExpenseClaimService>();
-builder.Services.AddScoped<IWorkOrderService, WorkOrderService>();
 builder.Services.AddScoped<IBudgetCategoryService, BudgetCategoryService>();
 builder.Services.AddScoped<IBudgetService, BudgetService>();
-builder.Services.AddScoped<IDashboardBudgetService, DashboardBudgetService>();
 
 builder.Services.AddScoped<IBudgetLineService, BudgetLineService>();
 
@@ -244,8 +236,18 @@ builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IVendorService, VendorService>();
 builder.Services.AddScoped<IVendorCategoryService, VendorCategoryService>();
 builder.Services.AddAutoMapper(typeof(AMCapexRequest));
-builder.Services.AddScoped<IReportService, ReportService>();
-builder.Services.AddScoped<IGeneralLedgerService, GeneralLedgerService>();
+builder.Services.AddScoped<ILoginService, LoginService>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Angular", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 var app = builder.Build();
 
 
@@ -263,7 +265,8 @@ await DatabaseSeeder.SeedAsync(app.Services);
 app.UseHttpsRedirection();
 
 app.UseRateLimiter();
-
+app.UseCors("Angular");
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 

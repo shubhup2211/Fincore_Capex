@@ -55,8 +55,6 @@ namespace Fincore.Domain.Models
         public User ModifiedByUser { get; set; }
 
         // Navigation Properties
-        public List<PurchaseRequisition> PurchaseRequisitions { get; set; }
-        public List<RFQ> RFQs { get; set; }
         public List<RFQVendor> RFQVendors { get; set; }
         public List<Quotation> Quotations { get; set; }
         public List<VendorSelection> VendorSelections { get; set; }

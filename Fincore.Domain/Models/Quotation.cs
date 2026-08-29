@@ -25,17 +25,17 @@ namespace Fincore.Domain.Models
 
         [Required]
         [StringLength(50)]
-        public string QuotationNumber { get; set; }
+        public string? QuotationNumber { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18,2)")]
-        public decimal QuotedAmount { get; set; }
+        public decimal? QuotedAmount { get; set; }
 
         [StringLength(500)]
         public string Remarks { get; set; }
 
         [Required]
-        public byte IsSelected { get; set; }
+        public byte? IsSelected { get; set; }
 
         public DateTime? CreatedAt { get; set; }
         public DateTime? ModifiedAt { get; set; }

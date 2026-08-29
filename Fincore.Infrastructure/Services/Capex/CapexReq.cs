@@ -80,11 +80,13 @@ namespace Fincore.Infrastructure.Services.Capex
 
             //Use AutoMapper to fetch
             capexlist = await db.CapexRequests
+                .AsNoTracking()
+                .OrderBy(x => x.CapexRequestId)
                 .Skip((page - 1) * pageSize).Take(pageSize)
                 .ProjectTo<CapexReqDTOGet>(map.ConfigurationProvider)
                 .ToListAsync();
 
-            if (capexlist ==null & !capexlist.Any())
+            if (!capexlist.Any())
             {
                 return ApiResponseHelper.Failure<List<CapexReqDTOGet>>(
                     "No Data Found for Capex", "EMPTY_DATA", "NO DATA TO SHOW");
@@ -166,31 +168,30 @@ namespace Fincore.Infrastructure.Services.Capex
         }
 
         //Submit Capex Request
-        public async Task<ApiResponse<string>> SubmitCapex(int id)
+        public async Task<ApiResponse<string>> SubmitCapex(CapexReqDTOPost capex, int userId)
         {
-            var res = await db.CapexRequests.FirstOrDefaultAsync(x => x.CapexRequestId == id);
+            var employee = await db.Employees
+             .FirstOrDefaultAsync(e => e.UserId == userId);
 
-            if (res == null)
+            if (employee == null)
             {
-                return ApiResponseHelper.Failure<string>(
-                    "CapexRequest Not Found",
-                    "NOT_FOUND",
-                    $"Capex Request with id {id} Not found");
+                return ApiResponseHelper.Failure<string>("Employee not found.","NOT_FOUND","Employee is not exist");
             }
 
-
-            if (res.ApprovalStatus != "Draft")
+            var departmentId = employee.DepartmentId;
+            // ---- Basic amount validation ----
+            if (capex.Amount <= 0)
             {
                 return ApiResponseHelper.Failure<string>(
-                    "Invalid Status",
-                    "INVALID_STATUS",
-                    "Only Draft Capex Requests can be submitted.");
+                    "Invalid Amount",
+                    "INVALID_AMOUNT",
+                    "CAPEX Amount must be greater than zero.");
             }
 
-            //  Get Budget line
+            // ---- Budget Line validation ----
             var budgetLine = await db.BudgetLines
                 .FirstOrDefaultAsync(x =>
-                    x.BudgetLineId == res.BudgetLineId &&
+                    x.BudgetLineId == capex.BudgetLineId &&
                     x.IsActive == 1);
 
             if (budgetLine == null)
@@ -201,52 +202,76 @@ namespace Fincore.Infrastructure.Services.Capex
                     "Budget Line is inactive or does not exist.");
             }
 
-            //  Calculate Remaining Budget amt
             decimal utilizedAmount = budgetLine.UtilizedAmount ?? 0;
             decimal remainingBudget = budgetLine.AllocatedAmount - utilizedAmount;
 
-            // Validate Budget amt
-            if (res.Amount > remainingBudget)
+            if (capex.Amount > remainingBudget)
             {
                 return ApiResponseHelper.Failure<string>(
                     "Budget Exceeded",
                     "BUDGET_EXCEEDED",
-                    $"Available Budget is {remainingBudget}, but requested amount is {res.Amount}.");
+                    $"Available Budget is {remainingBudget}, but requested amount is {capex.Amount}.");
             }
 
-            //  Check Approval Flow
+            // ---- Approval Flow validation (must exist for the amount) ----
             var approvalFlow = await db.ApprovalFlows
                 .FirstOrDefaultAsync(x =>
                     x.IsActive == 1 &&
-                    res.Amount >= x.MinAmount &&
-                    res.Amount <= x.MaxAmount);
+                    capex.Amount >= x.MinAmount &&
+                    capex.Amount <= x.MaxAmount);
 
             if (approvalFlow == null)
             {
                 return ApiResponseHelper.Failure<string>(
                     "Approval Flow Not Configured",
                     "APPROVAL_FLOW_NOT_FOUND",
-                    $"No Approval Flow configured for amount {res.Amount}.");
+                    $"No Approval Flow configured for amount {capex.Amount}.");
             }
 
+            // ---- Map DTO -> Entity ----
+            var raise = map.Map<CapexRequest>(capex);
 
+            // JWT-driven fields (never trust client)
+            raise.RequestedBy = userId;
+            raise.ApprovalStatus = "Submitted";
+            raise.CreatedAt = DateTime.Now;
+            raise.ModifiedAt = DateTime.Now;
+            raise.ApprovedBy = null;
+            raise.ApprovedAt = null;
 
-            res.ApprovalStatus = "Submitted";
-            res.ModifiedAt = DateTime.Now;
+            await db.CapexRequests.AddAsync(raise);
+            int result = await db.SaveChangesAsync();
 
-            await db.SaveChangesAsync();
+            memoryCache.Remove($"Capex_{raise.CapexRequestId}");
 
-            string cache = $"{id}";
-            memoryCache.Remove(cache);
-
-            return ApiResponseHelper.SuccessRes(
-                $"Capex Request Submitted Successfully with id {id}");
+            if (result > 0)
+            {
+                return ApiResponseHelper.SuccessRes<string>(
+                    $"CAPEX Request Submitted Successfully with id {raise.CapexRequestId}",
+                    "CAPEX_SUBMIT_DONE");
+            }
+            else
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "CAPEX Submit Failed",
+                    "ERROR_OCCURED_TRY_AGAIN",
+                    "Submit Again!");
+            }
         }
-
         //Approve Capex Request
-        public async Task<ApiResponse<string>> ApproveCapex(int id)
+        public async Task<ApiResponse<string>> ApproveCapex(int id, int userId)
         {
             var res = await db.CapexRequests.FirstOrDefaultAsync(x => x.CapexRequestId == id);
+
+            var user = await db.Users
+    .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+            {
+                return ApiResponseHelper.Failure<string>("User not found","NOT_FOUND","User not exist");
+            }
+
+            var roleId = user.RoleId;
 
             if (res == null)
             {
@@ -264,7 +289,31 @@ namespace Fincore.Infrastructure.Services.Capex
                     "Only Submitted Capex Requests can be Approved");
             }
 
+            // Find the matching Approval Flow for this amount
+            var approvalFlow = await db.ApprovalFlows
+                .FirstOrDefaultAsync(x =>
+                    x.IsActive == 1 &&
+                    res.Amount >= x.MinAmount &&
+                    res.Amount <= x.MaxAmount);
 
+            if (approvalFlow == null)
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "Approval Flow Not Configured",
+                    "APPROVAL_FLOW_NOT_FOUND",
+                    $"No Approval Flow configured for amount {res.Amount}.");
+            }
+
+            // Only the role assigned in the approval flow can approve
+            if (approvalFlow.RequiredRoleId != roleId)
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "Unauthorized",
+                    "ROLE_NOT_ALLOWED",
+                    "Your role is not authorized to approve this CAPEX request.");
+            }
+
+            // Budget update
             var budgetLine = await db.BudgetLines
                 .FirstOrDefaultAsync(x =>
                     x.BudgetLineId == res.BudgetLineId &&
@@ -278,25 +327,45 @@ namespace Fincore.Infrastructure.Services.Capex
                     "Budget Line is inactive or does not exist.");
             }
 
-            budgetLine.UtilizedAmount = (budgetLine.UtilizedAmount ?? 0) + res.Amount;
+            decimal utilized = budgetLine.UtilizedAmount ?? 0;
+            decimal remaining = budgetLine.AllocatedAmount - utilized;
+            if (res.Amount > remaining)
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "Budget Exceeded",
+                    "BUDGET_EXCEEDED",
+                    $"Available Budget is {remaining}, but requested amount is {res.Amount}.");
+            }
+
+            budgetLine.UtilizedAmount = utilized + res.Amount;
 
             res.ApprovalStatus = "Approved";
+            res.ApprovedBy = userId;
             res.ApprovedAt = DateTime.Now;
             res.ModifiedAt = DateTime.Now;
 
             await db.SaveChangesAsync();
 
-            string cache = $"{id}";
-            memoryCache.Remove(cache);
+            memoryCache.Remove($"{id}");
 
-            return ApiResponseHelper.SuccessRes(
+            return ApiResponseHelper.SuccessRes<string>(
                 $"Capex Request Approved Successfully with id {id}");
         }
-
         //Reject Capex Request
-        public async Task<ApiResponse<string>> RejectCapex(int id)
+        public async Task<ApiResponse<string>> RejectCapex(int id, int userId)
         {
             var res = await db.CapexRequests.FirstOrDefaultAsync(x => x.CapexRequestId == id);
+
+
+            var user = await db.Users
+    .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+            {
+                return ApiResponseHelper.Failure<string>("User not found", "NOT_FOUND", "User not exist");
+            }
+
+            var roleId = user.RoleId;
 
             if (res == null)
             {
@@ -314,7 +383,6 @@ namespace Fincore.Infrastructure.Services.Capex
                     "Only Submitted Capex Requests can be Rejected");
             }
 
-            // Check Approval Flow for the Amount
             var approvalFlow = await db.ApprovalFlows
                 .FirstOrDefaultAsync(x =>
                     x.IsActive == 1 &&
@@ -329,16 +397,66 @@ namespace Fincore.Infrastructure.Services.Capex
                     $"No Approval Flow configured for amount {res.Amount}");
             }
 
+            if (approvalFlow.RequiredRoleId != roleId)
+            {
+                return ApiResponseHelper.Failure<string>(
+                    "Unauthorized",
+                    "ROLE_NOT_ALLOWED",
+                    "Your role is not authorized to reject this CAPEX request.");
+            }
+
             res.ApprovalStatus = "Rejected";
+            res.ApprovedBy = userId;   // track who rejected (audit)
+            res.ApprovedAt = DateTime.Now;
             res.ModifiedAt = DateTime.Now;
 
             await db.SaveChangesAsync();
 
-            string cache = $"{id}";
-            memoryCache.Remove(cache);
+            memoryCache.Remove($"{id}");
+
+            return ApiResponseHelper.SuccessRes<string>(
+                $"Capex Request Rejected Successfully with id {id}");
+        }
+
+        public async Task<ApiResponse<List<CapexReqDTOGet>>> GetPendingApprovals(int userId)
+        {
+            var user = await db.Users
+    .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+            {
+                return ApiResponseHelper.Failure<List<CapexReqDTOGet>>("User not found", "NOT_FOUND", "User not exist");
+            }
+
+            var roleId = user.RoleId;
+
+            var pending = await (
+                from c in db.CapexRequests.AsNoTracking()
+                join af in db.ApprovalFlows.AsNoTracking()
+                    on true equals true
+                where c.ApprovalStatus == "Submitted"
+                      && af.IsActive == 1
+                      && af.RequiredRoleId == roleId
+                      && c.Amount >= af.MinAmount
+                      && c.Amount <= af.MaxAmount
+                select c
+            )
+            .Distinct()
+            .ProjectTo<CapexReqDTOGet>(map.ConfigurationProvider)
+            .ToListAsync();
+
+            if (pending == null || !pending.Any())
+            {
+                return ApiResponseHelper.Failure<List<CapexReqDTOGet>>(
+                    "No Pending Approvals",
+                    "EMPTY_DATA",
+                    "There are no CAPEX requests awaiting your approval.");
+            }
 
             return ApiResponseHelper.SuccessRes(
-                $"Capex Request Rejected Successfully with id {id}");
+                pending,
+                "Pending Approvals Fetched Successfully",
+                pending.Count);
         }
     }
 }

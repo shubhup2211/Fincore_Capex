@@ -89,30 +89,41 @@ namespace Fincore.Infrastructure.Seed.Budget
             if (await db.BudgetLines.AnyAsync()) return;
 
             var budgets    = await db.Budgets.OrderBy(b => b.BudgetId).ToListAsync();
-            var categories = await db.BudgetCategories.OrderBy(c => c.BudgetCategoryId).ToListAsync();
+            var vendorCategories = await db.VendorCategories.OrderBy(v => v.VendorCategoryId).ToListAsync();
+            var departments = await db.Departments.OrderBy(d => d.DepartmentId).ToListAsync();
             var admin = RoleSeeder.BootstrapUserId;
             var now = DateTime.UtcNow;
             var rng = new Randomizer(FakerHelper.GlobalSeed + 7);
 
             var list = new List<BudgetLine>();
+
             for (int i = 0; i < 25; i++)
             {
                 var budget = budgets[i % budgets.Count];
-                var cat    = categories[i % categories.Count];
-                var alloc  = System.Math.Round((decimal)rng.Double(25000, 500000), 2);
+                var vendorCategory = vendorCategories[i % vendorCategories.Count];
+                var department = departments[i % departments.Count];
+
+                var allocated = Math.Round((decimal)rng.Double(25000, 500000), 2);
+                var utilized = Math.Round(allocated * (decimal)rng.Double(0.1, 0.9), 2);
+
                 list.Add(new BudgetLine
                 {
-                    BudgetId          = budget.BudgetId,
-                    BudgetCategoryId  = cat.BudgetCategoryId,
-                    AllocatedAmount   = alloc,
-                    UtilizedAmount    = System.Math.Round(alloc * (decimal)rng.Double(0.1, 0.9), 2),
-                    IsActive          = 1,
-                    CreatedAt         = now,
-                    ModifiedAt        = now,
-                    CreatedBy         = admin,
-                    ModifiedBy        = admin
+                    BudgetId = budget.BudgetId,
+                    VendorCategoryId = vendorCategory.VendorCategoryId,
+                    DepartmentId = department.DepartmentId,
+
+                    AllocatedAmount = allocated,
+                    UtilizedAmount = utilized,
+                    RemainingAmount = allocated - utilized,
+
+                    IsActive = 1,
+                    CreatedAt = now,
+                    ModifiedAt = now,
+                    CreatedBy = admin,
+                    ModifiedBy = admin
                 });
             }
+
             db.BudgetLines.AddRange(list);
             await db.SaveChangesAsync();
         }

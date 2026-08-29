@@ -65,7 +65,7 @@ namespace Fincore.Infrastructure.Services.BudgetLine
                     query = query.Where(x => x.BudgetId == budgetId);
 
                 if (budgetCategoryId.HasValue)
-                    query = query.Where(x => x.BudgetCategoryId == budgetCategoryId);
+                    query = query.Where(x => x.VendorCategoryId == budgetCategoryId);
 
                 if (isActive.HasValue)
                     query = query.Where(x => x.IsActive == isActive);

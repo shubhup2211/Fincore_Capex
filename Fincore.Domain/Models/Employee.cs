@@ -53,6 +53,7 @@ namespace Fincore.Domain.Models
         // Navigation Properties
         public List<Employee> Subordinates { get; set; }
         public List<RFQ> RFQsCreated { get; set; }
+        public List<RFQ> RFQsModified { get; set; }
         public List<GRN> GRNsCreated { get; set; }
     }
 }

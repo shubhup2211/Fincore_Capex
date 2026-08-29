@@ -26,11 +26,25 @@ namespace Fincore.Domain.Models
         public string PRTitle { get; set; }
 
         [Required]
+        [ForeignKey("VendorCategory")]
+        public int CategoryId { get; set; }
+        public VendorCategory VendorCategory { get; set; }
+
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? Amount { get; set; }
+
+        [Required]
         [ForeignKey("RequestedByUser")]
         public int RequestedBy { get; set; }
         public User RequestedByUser { get; set; }
 
         public DateTime? RequiredTillDate { get; set; }
+
+        [Required]
+        [ForeignKey("RequiredRole")]
+        public int RequiredRoleId { get; set; }
+        public Role RequiredRole { get; set; }
 
         [Required]
         [StringLength(30)]
@@ -40,12 +54,12 @@ namespace Fincore.Domain.Models
         public int? ApprovedBy { get; set; }
         public User ApprovedByUser { get; set; }
 
-        public byte? IsActive { get; set; }
+        public byte IsActive { get; set; }
         public DateTime? ApprovedAt { get; set; }
-        public DateTime? CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         [Required]
-        public DateTime ModifiedAt { get; set; }
+        public DateTime? ModifiedAt { get; set; }
 
         [Required]
         [ForeignKey("CreatedByUser")]
@@ -54,7 +68,7 @@ namespace Fincore.Domain.Models
 
         [Required]
         [ForeignKey("ModifiedByUser")]
-        public int ModifiedBy { get; set; }
+        public int? ModifiedBy { get; set; }
         public User ModifiedByUser { get; set; }
 
         // Navigation Properties

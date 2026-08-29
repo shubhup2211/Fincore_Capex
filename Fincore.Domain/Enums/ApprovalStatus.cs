@@ -8,6 +8,7 @@ namespace Fincore.Domain.Enums
 {
     public enum ApprovalStatus
     {
+        Draft,
         Pending,
         Approved,
         Rejected

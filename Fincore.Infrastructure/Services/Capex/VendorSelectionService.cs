@@ -173,7 +173,7 @@ namespace Fincore.Infrastructure.Services.Capex
                     QuotationNumber = x.QuotationNumber,
                     CompanyName = x.Vendor.Company.CompanyName,
                     VendorCode = x.Vendor.VendorCode,
-                    QuotedAmount = x.QuotedAmount,
+                    QuotedAmount = x.QuotedAmount ?? 0,
                     Remarks = x.Remarks,
                     SelectionStatus = x.IsSelected == 1 ? "Selected" : "Not Selected",
                     CreatedAt = x.CreatedAt

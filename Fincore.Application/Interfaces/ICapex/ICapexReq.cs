@@ -21,9 +21,10 @@ namespace Fincore.Application.Interfaces.ICapex
 
         Task<ApiResponse<string>> DeleteCapex( int id );
 
-        Task<ApiResponse<string>> SubmitCapex(int id);
-        Task<ApiResponse<string>> ApproveCapex(int id);
+        Task<ApiResponse<string>> SubmitCapex(CapexReqDTOPost capex, int userId);
+        Task<ApiResponse<string>> ApproveCapex(int id, int userId);
 
-        Task<ApiResponse<string>> RejectCapex(int id);
+        Task<ApiResponse<string>> RejectCapex(int id, int userId);
+        Task<ApiResponse<List<CapexReqDTOGet>>> GetPendingApprovals(int userId);
     }
 }

@@ -38,7 +38,5 @@ namespace Fincore.Domain.Models
         public int ModifiedBy { get; set; }
         public User ModifiedByUser { get; set; }
 
-        // Navigation Properties
-        public List<BudgetLine> BudgetLines { get; set; }
     }
 }

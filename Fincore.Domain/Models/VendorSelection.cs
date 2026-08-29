@@ -25,7 +25,7 @@ namespace Fincore.Domain.Models
 
         [Required]
         [ForeignKey("SelectedVendor")]
-        public int SelectedVendorId { get; set; }
+        public int? SelectedVendorId { get; set; }
         public Vendor SelectedVendor { get; set; }
 
         public DateTime? SelectedDate { get; set; }
@@ -35,6 +35,6 @@ namespace Fincore.Domain.Models
         public User SelectedByUser { get; set; }
 
         [StringLength(20)]
-        public string Remarks { get; set; }
+        public string? Remarks { get; set; }
     }
 }

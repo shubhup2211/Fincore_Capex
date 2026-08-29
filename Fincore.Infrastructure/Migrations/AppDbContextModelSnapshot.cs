@@ -509,9 +509,6 @@ namespace Fincore.Infrastructure.Migrations
                     b.Property<decimal>("AllocatedAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("BudgetCategoryId")
-                        .HasColumnType("int");
-
                     b.Property<int>("BudgetId")
                         .HasColumnType("int");
 
@@ -519,6 +516,9 @@ namespace Fincore.Infrastructure.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
                     b.Property<byte>("IsActive")
@@ -530,18 +530,26 @@ namespace Fincore.Infrastructure.Migrations
                     b.Property<int>("ModifiedBy")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("RemainingAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal?>("UtilizedAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.HasKey("BudgetLineId");
+                    b.Property<int>("VendorCategoryId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("BudgetCategoryId");
+                    b.HasKey("BudgetLineId");
 
                     b.HasIndex("BudgetId");
 
                     b.HasIndex("CreatedBy");
 
+                    b.HasIndex("DepartmentId");
+
                     b.HasIndex("ModifiedBy");
+
+                    b.HasIndex("VendorCategoryId");
 
                     b.ToTable("BudgetLines");
                 });
@@ -568,14 +576,19 @@ namespace Fincore.Infrastructure.Migrations
                     b.Property<int?>("ApprovedBy")
                         .HasColumnType("int");
 
+                    b.Property<int>("ApproverId")
+                        .HasColumnType("int");
+
                     b.Property<int>("BudgetLineId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("CapexReqNumber")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
 
-                    b.Property<int>("DepartmentId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -587,6 +600,9 @@ namespace Fincore.Infrastructure.Migrations
                     b.Property<int>("RequestedBy")
                         .HasColumnType("int");
 
+                    b.Property<int>("RequiredRoleId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -596,11 +612,13 @@ namespace Fincore.Infrastructure.Migrations
 
                     b.HasIndex("ApprovedBy");
 
+                    b.HasIndex("ApproverId");
+
                     b.HasIndex("BudgetLineId");
 
-                    b.HasIndex("DepartmentId");
-
                     b.HasIndex("RequestedBy");
+
+                    b.HasIndex("RequiredRoleId");
 
                     b.ToTable("CapexRequests");
                 });
@@ -1561,6 +1579,10 @@ namespace Fincore.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseRequisitionId"));
 
+                    b.Property<decimal?>("Amount")
+                        .IsRequired()
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("ApprovalStatus")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -1575,19 +1597,24 @@ namespace Fincore.Infrastructure.Migrations
                     b.Property<int?>("CapexRequestId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<byte?>("IsActive")
+                    b.Property<byte>("IsActive")
                         .HasColumnType("tinyint");
 
-                    b.Property<DateTime>("ModifiedAt")
+                    b.Property<DateTime?>("ModifiedAt")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ModifiedBy")
+                    b.Property<int?>("ModifiedBy")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("PRNumber")
@@ -1603,17 +1630,19 @@ namespace Fincore.Infrastructure.Migrations
                     b.Property<int>("RequestedBy")
                         .HasColumnType("int");
 
+                    b.Property<int>("RequiredRoleId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("RequiredTillDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("VendorId")
-                        .HasColumnType("int");
 
                     b.HasKey("PurchaseRequisitionId");
 
                     b.HasIndex("ApprovedBy");
 
                     b.HasIndex("CapexRequestId");
+
+                    b.HasIndex("CategoryId");
 
                     b.HasIndex("CreatedBy");
 
@@ -1624,7 +1653,7 @@ namespace Fincore.Infrastructure.Migrations
 
                     b.HasIndex("RequestedBy");
 
-                    b.HasIndex("VendorId");
+                    b.HasIndex("RequiredRoleId");
 
                     b.ToTable("PurchaseRequisitions");
                 });
@@ -1637,14 +1666,10 @@ namespace Fincore.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PRItemId"));
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<decimal?>("EstimatedUnitPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ItemDescription")
-                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -1653,12 +1678,8 @@ namespace Fincore.Infrastructure.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<string>("ItemStatus")
+                    b.Property<decimal?>("LineTotal")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<decimal>("LineTotal")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("PurchaseRequisitionId")
@@ -1667,20 +1688,12 @@ namespace Fincore.Infrastructure.Migrations
                     b.Property<decimal>("Quantity")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("TaxAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("TaxPercentage")
-                        .HasColumnType("decimal(5,2)");
-
                     b.Property<string>("UnitOfMaterial")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("PRItemId");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("PurchaseRequisitionId");
 
@@ -1698,7 +1711,8 @@ namespace Fincore.Infrastructure.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<byte>("IsSelected")
+                    b.Property<byte?>("IsSelected")
+                        .IsRequired()
                         .HasColumnType("tinyint");
 
                     b.Property<DateTime?>("ModifiedAt")
@@ -1709,7 +1723,8 @@ namespace Fincore.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<decimal>("QuotedAmount")
+                    b.Property<decimal?>("QuotedAmount")
+                        .IsRequired()
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("RFQId")
@@ -1778,28 +1793,27 @@ namespace Fincore.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RFQId"));
 
-                    b.Property<DateTime?>("CreatedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<byte?>("IsActive")
+                    b.Property<byte>("IsActive")
                         .HasColumnType("tinyint");
 
-                    b.Property<DateTime?>("IssueDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastDate")
+                    b.Property<DateTime>("LastDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("ModifiedBy")
+                        .HasColumnType("int");
 
                     b.Property<int>("PurchaseRequisitionId")
                         .HasColumnType("int");
@@ -1814,19 +1828,16 @@ namespace Fincore.Infrastructure.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<int?>("VendorId")
-                        .HasColumnType("int");
-
                     b.HasKey("RFQId");
 
                     b.HasIndex("CreatedBy");
+
+                    b.HasIndex("ModifiedBy");
 
                     b.HasIndex("PurchaseRequisitionId");
 
                     b.HasIndex("RFQNumber")
                         .IsUnique();
-
-                    b.HasIndex("VendorId");
 
                     b.ToTable("RFQs");
                 });
@@ -1838,9 +1849,6 @@ namespace Fincore.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RFQVendorId"));
-
-                    b.Property<DateTime?>("InvitedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("RFQId")
                         .HasColumnType("int");
@@ -2236,7 +2244,6 @@ namespace Fincore.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Remarks")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
@@ -2246,7 +2253,8 @@ namespace Fincore.Infrastructure.Migrations
                     b.Property<DateTime?>("SelectedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("SelectedVendorId")
+                    b.Property<int?>("SelectedVendorId")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.HasKey("VendorSelectionId");
@@ -2534,12 +2542,6 @@ namespace Fincore.Infrastructure.Migrations
 
             modelBuilder.Entity("Fincore.Domain.Models.BudgetLine", b =>
                 {
-                    b.HasOne("Fincore.Domain.Models.BudgetCategory", "BudgetCategory")
-                        .WithMany("BudgetLines")
-                        .HasForeignKey("BudgetCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Fincore.Domain.Models.Budget", "Budget")
                         .WithMany("BudgetLines")
                         .HasForeignKey("BudgetId")
@@ -2552,19 +2554,33 @@ namespace Fincore.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Fincore.Domain.Models.Department", "Department")
+                        .WithMany("BudgetLines")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Fincore.Domain.Models.User", "ModifiedByUser")
                         .WithMany("BudgetLinesModified")
                         .HasForeignKey("ModifiedBy")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Budget");
+                    b.HasOne("Fincore.Domain.Models.VendorCategory", "VendorCategory")
+                        .WithMany("BudgetLines")
+                        .HasForeignKey("VendorCategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("BudgetCategory");
+                    b.Navigation("Budget");
 
                     b.Navigation("CreatedByUser");
 
+                    b.Navigation("Department");
+
                     b.Navigation("ModifiedByUser");
+
+                    b.Navigation("VendorCategory");
                 });
 
             modelBuilder.Entity("Fincore.Domain.Models.CapexRequest", b =>
@@ -2574,15 +2590,15 @@ namespace Fincore.Infrastructure.Migrations
                         .HasForeignKey("ApprovedBy")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("Fincore.Domain.Models.BudgetLine", "BudgetLine")
-                        .WithMany("CapexRequests")
-                        .HasForeignKey("BudgetLineId")
+                    b.HasOne("Fincore.Domain.Models.User", "Approver")
+                        .WithMany("CapexApprovals")
+                        .HasForeignKey("ApproverId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Fincore.Domain.Models.Department", "Department")
+                    b.HasOne("Fincore.Domain.Models.BudgetLine", "BudgetLine")
                         .WithMany("CapexRequests")
-                        .HasForeignKey("DepartmentId")
+                        .HasForeignKey("BudgetLineId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -2592,13 +2608,21 @@ namespace Fincore.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Fincore.Domain.Models.ApprovalFlow", "RequiredRole")
+                        .WithMany("CapexRequests")
+                        .HasForeignKey("RequiredRoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("ApprovedByUser");
+
+                    b.Navigation("Approver");
 
                     b.Navigation("BudgetLine");
 
-                    b.Navigation("Department");
-
                     b.Navigation("RequestedByUser");
+
+                    b.Navigation("RequiredRole");
                 });
 
             modelBuilder.Entity("Fincore.Domain.Models.City", b =>
@@ -3085,6 +3109,12 @@ namespace Fincore.Infrastructure.Migrations
                         .HasForeignKey("CapexRequestId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Fincore.Domain.Models.VendorCategory", "VendorCategory")
+                        .WithMany("PurchaseRequisitions")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("Fincore.Domain.Models.User", "CreatedByUser")
                         .WithMany("PurchaseRequisitionsCreated")
                         .HasForeignKey("CreatedBy")
@@ -3103,9 +3133,11 @@ namespace Fincore.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Fincore.Domain.Models.Vendor", null)
+                    b.HasOne("Fincore.Domain.Models.Role", "RequiredRole")
                         .WithMany("PurchaseRequisitions")
-                        .HasForeignKey("VendorId");
+                        .HasForeignKey("RequiredRoleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("ApprovedByUser");
 
@@ -3116,16 +3148,14 @@ namespace Fincore.Infrastructure.Migrations
                     b.Navigation("ModifiedByUser");
 
                     b.Navigation("RequestedByUser");
+
+                    b.Navigation("RequiredRole");
+
+                    b.Navigation("VendorCategory");
                 });
 
             modelBuilder.Entity("Fincore.Domain.Models.PurchaseRequisitionItem", b =>
                 {
-                    b.HasOne("Fincore.Domain.Models.VendorCategory", "VendorCategory")
-                        .WithMany("PurchaseRequisitionItems")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Fincore.Domain.Models.PurchaseRequisition", "PurchaseRequisition")
                         .WithMany("PurchaseRequisitionItems")
                         .HasForeignKey("PurchaseRequisitionId")
@@ -3133,8 +3163,6 @@ namespace Fincore.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("PurchaseRequisition");
-
-                    b.Navigation("VendorCategory");
                 });
 
             modelBuilder.Entity("Fincore.Domain.Models.Quotation", b =>
@@ -3183,17 +3211,20 @@ namespace Fincore.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("Fincore.Domain.Models.Employee", "ModifiedByEmployee")
+                        .WithMany("RFQsModified")
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Fincore.Domain.Models.PurchaseRequisition", "PurchaseRequisition")
                         .WithMany("RFQs")
                         .HasForeignKey("PurchaseRequisitionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Fincore.Domain.Models.Vendor", null)
-                        .WithMany("RFQs")
-                        .HasForeignKey("VendorId");
-
                     b.Navigation("CreatedByEmployee");
+
+                    b.Navigation("ModifiedByEmployee");
 
                     b.Navigation("PurchaseRequisition");
                 });
@@ -3466,12 +3497,12 @@ namespace Fincore.Infrastructure.Migrations
                     b.Navigation("RevenueEntries");
                 });
 
-            modelBuilder.Entity("Fincore.Domain.Models.Budget", b =>
+            modelBuilder.Entity("Fincore.Domain.Models.ApprovalFlow", b =>
                 {
-                    b.Navigation("BudgetLines");
+                    b.Navigation("CapexRequests");
                 });
 
-            modelBuilder.Entity("Fincore.Domain.Models.BudgetCategory", b =>
+            modelBuilder.Entity("Fincore.Domain.Models.Budget", b =>
                 {
                     b.Navigation("BudgetLines");
                 });
@@ -3526,7 +3557,7 @@ namespace Fincore.Infrastructure.Migrations
 
                     b.Navigation("BudgetCategories");
 
-                    b.Navigation("CapexRequests");
+                    b.Navigation("BudgetLines");
 
                     b.Navigation("Employees");
 
@@ -3543,6 +3574,8 @@ namespace Fincore.Infrastructure.Migrations
                     b.Navigation("GRNsCreated");
 
                     b.Navigation("RFQsCreated");
+
+                    b.Navigation("RFQsModified");
 
                     b.Navigation("Subordinates");
                 });
@@ -3626,6 +3659,8 @@ namespace Fincore.Infrastructure.Migrations
 
                     b.Navigation("Permissions");
 
+                    b.Navigation("PurchaseRequisitions");
+
                     b.Navigation("Users");
                 });
 
@@ -3661,6 +3696,8 @@ namespace Fincore.Infrastructure.Migrations
                     b.Navigation("BudgetsCreated");
 
                     b.Navigation("BudgetsModified");
+
+                    b.Navigation("CapexApprovals");
 
                     b.Navigation("CapexRequestsApproved");
 
@@ -3753,13 +3790,9 @@ namespace Fincore.Infrastructure.Migrations
 
                     b.Navigation("PurchaseOrders");
 
-                    b.Navigation("PurchaseRequisitions");
-
                     b.Navigation("Quotations");
 
                     b.Navigation("RFQVendors");
-
-                    b.Navigation("RFQs");
 
                     b.Navigation("VendorSelections");
 
@@ -3768,7 +3801,9 @@ namespace Fincore.Infrastructure.Migrations
 
             modelBuilder.Entity("Fincore.Domain.Models.VendorCategory", b =>
                 {
-                    b.Navigation("PurchaseRequisitionItems");
+                    b.Navigation("BudgetLines");
+
+                    b.Navigation("PurchaseRequisitions");
 
                     b.Navigation("Vendors");
                 });
